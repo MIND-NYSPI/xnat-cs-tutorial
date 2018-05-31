@@ -4,7 +4,7 @@ This tutorial assumes you have a working XNAT instance. You must have administra
 
 ## Installing the Container Service plugin.
 
-Download the .jar file of the “Latest Release” on this page to <xnat-home>/plugins and restart the tomcat server
+Download the .jar file of the “Latest Release” on this page to `<xnat-home>/plugins` and restart the tomcat server.
 
 In more detail: 
 ..*Nagivate to the plugins directory under your XNAT home directory.  
