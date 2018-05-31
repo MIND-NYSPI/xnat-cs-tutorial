@@ -1,8 +1,19 @@
-# A tutorial on getting XNAT’s container service up and running and writing commands
+# XNAT's Container Service: a Tutorial
 
-This tutorial assumes you have a working XNAT instance. You must have administrator priveleges on your XNAT instance to use the Container Service.  If you are not sure how to set up an XNAT instance and would like a quick way to get up and running.  
+## Table of Contents
+  [What You Need Before You Begin](#what-you-need-before-you-begin)
+  [Installing the Container Service Plugin](#installing-the-container-service-plugin)  
+  [Installing Images for the Container Service](#installing-images-for-the-container-service)  
+  [Setting Up a First Command](#setting_up_a_first_command)  
+  [Launching a Container](#launching_a_container)  
+  [Glossary](#glossary)  
 
-## Installing the Container Service plugin.
+## What You Need Before You Begin
+
+This tutorial assumes you have a working XNAT instance. You must have administrator privileges on your XNAT instance to use the Container Service.  If you are not sure how to set up an XNAT instance and would like a quick way to get up and running, the one-line XNAT VM setup described [here](https://wiki.xnat.org/display/XNAT17/Running+XNAT+in+a+Vagrant+Virtual+Machine) is a quick way to get started.  If you've installed the prerequisites and executed that line of code, your XNAT web interface should be available in your browser at 10.1.1.17, login: admin and password: admin.
+
+
+## Installing the Container Service plugin
 
 Download the .jar file of the “Latest Release” on this page to `<xnat-home>/plugins` and restart the tomcat server.
 
@@ -57,7 +68,7 @@ If instead you needed to run another program, like SPM, you could search Docker 
 
 The image should begin downloading.  When it completes, if you navigate to Administer -> Plugin Settings -> Images & Commands, you should see listed `brainlife/fsl:latest`. 
 
-## Setting up a first command
+## Setting Up a First Command
 
 XNAT requires information about what command-line instruction to send to the Docker container, what inputs that process expects, and how to process any outputs, if outputs are expected.  We give this information to XNAT in a JSON object called the command.  We'll start with the "Hello, World" of commands, adapted from the [official documentation](https://wiki.xnat.org/display/CS/Command).  
 
@@ -83,7 +94,7 @@ Navigate to Administer -> Plugin Settings -> Images and Commands.  Press the but
 
 The entry for `command-line` in the JSON object is, unusually intuitively for this context, the code that will actually be executed at the command prompt of your docker container.  However, the string in hash marks won't be executed verbatim.  Instead, it will be matched with an input replacement key from one of the members of the list of inputs (the array that's the value for the key `inputs`).  You can specify an input replacement key, but by default every input has an input replacement key `#<input-name>#`. So `"echo #my_cool_input#"` will actually send to the command line the instruction to echo whatever the value of the input `my_cool_input` is.  We can see the default value is set to "Hello world", though we will see how to launch a container with other values in the next section.  
 
-## Launching a container
+## Launching a Container
 
 Commands in XNAT are launched via the REST API.  A REST API is a set of conventions wherein a program (here, the container service) can send requests to a application (here, the XNAT instance) via a URI (route), and the program responds.  In this case, all the requests we will send will be POST requests.  That means we will be sending some information along with the URI which gives the the application additional information.  
 
