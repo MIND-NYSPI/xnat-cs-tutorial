@@ -57,7 +57,33 @@ If instead you needed to run another program, like SPM, you could search Docker 
 
 The image should begin downloading.  When it completes, if you navigate to Administer -> Plugin Settings -> Images & Commands, you should see listed `brainlife/fsl:latest`. 
 
-## Running a command
+## Setting up a first command
+
+XNAT requires information about what command-line instruction to send to the Docker container, what inputs that process expects, and how to process any outputs, if outputs are expected.  We give this information to XNAT in a JSON object called the command.  We'll start with the "Hello, World" of commands, adapted from the [official documentation](https://wiki.xnat.org/display/CS/Command).  
+
+Navigate to Administer -> Plugin Settings -> Images and Commands.  Press the button `Add New Command` next to the listing for the brainlife/fsl image.  Copy and paste the following JSON object into the box that pops up (you can paste over the braces that are there by default), and click `Save Command`.
+
+```
+{
+    "name": "hello-world",
+    "description": "Prints a string to stdout",
+    "type": "docker",
+    "image": "brainlife/fsl:latest",
+    "command-line": "echo #my_cool_input#",
+    "inputs": [
+        {
+            "name": "my_cool_input",
+            "description": "The string that will be printed",
+            "type": "string",
+            "default-value": "Hello world"
+        }
+    ]
+}
+```
+
+The entry for `command-line` in the JSON object is, unusually intuitively for this context, the code that will actually be executed at the command prompt of your docker container.  However, the string in hash marks won't be executed verbatim.  Instead, it will be matched with an input replacement key from one of the members of the list of inputs (the array that's the value for the key `inputs`).  You can specify an input replacement key, but by default every input has an input replacement key `#<input-name>#`. So `"echo #my_cool_input#"` will actually send to the command line the instruction to echo whatever the value of the input `my_cool_input` is.  We can see the default value is set to "Hello world", though we will see how to launch a container with other values in the next section.  
+
+## Launching a command
 
 
 
@@ -71,7 +97,9 @@ Docker Hub: a repository with pre-built Docker Images.
 
 Docker Image: an image is a snapshot of a machine that has the capacity to run processes.  It form the basis for a Docker container. 
 
-Command: a JSON file that gives XNAT the information it needs run processes in a Docker Container.  
+Command: a JSON file that gives XNAT the information it needs run processes in a Docker Container. 
+
+Input Replacement Key: a string in the command-line value of the command that will be matched with, and replaced by, a string from an input provided when the container is launched.
 
 
 
