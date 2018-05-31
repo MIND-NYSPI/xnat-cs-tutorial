@@ -83,7 +83,15 @@ Navigate to Administer -> Plugin Settings -> Images and Commands.  Press the but
 
 The entry for `command-line` in the JSON object is, unusually intuitively for this context, the code that will actually be executed at the command prompt of your docker container.  However, the string in hash marks won't be executed verbatim.  Instead, it will be matched with an input replacement key from one of the members of the list of inputs (the array that's the value for the key `inputs`).  You can specify an input replacement key, but by default every input has an input replacement key `#<input-name>#`. So `"echo #my_cool_input#"` will actually send to the command line the instruction to echo whatever the value of the input `my_cool_input` is.  We can see the default value is set to "Hello world", though we will see how to launch a container with other values in the next section.  
 
-## Launching a command
+## Launching a container
+
+Commands in XNAT are launched via the REST API.  A REST API is a set of conventions wherein a program (here, the container service) can send requests to a application (here, the XNAT instance) via a URI (route), and the program responds.  In this case, all the requests we will send will be POST requests.  That means we will be sending some information along with the URI which gives the the application additional information.  
+
+If you are familiar with REST, you know that there are lots of ways to make REST requests: curl, Postman,and the Python requests library are all options that could make sense in this context.  In this tutorial, we will be using the Swagger web interface to the API provided by XNAT. The subset of XNAT's API that you access with Swagger are the routes that trigger internal XNAT functions.  All these routes start with `/xapi`.  The URL of the Swagger interface is `http://<xnat-instance-url>/xapi/swagger-ui.html`. If you are running the Vagrant XNAT instance locally that URL is (http://10.1.1.17/xapi/swagger-ui.html).  
+
+![an image of the Swagger web interface](Swagger.png)
+
+We are going to launch a container, so we scroll down to `launch-rest-api` 
 
 
 
@@ -100,6 +108,10 @@ Docker Image: an image is a snapshot of a machine that has the capacity to run p
 Command: a JSON file that gives XNAT the information it needs run processes in a Docker Container. 
 
 Input Replacement Key: a string in the command-line value of the command that will be matched with, and replaced by, a string from an input provided when the container is launched.
+
+REST API: a set of conventions wherein a program can send requests to a application via a URI to either get information from the application's back end, or to provide data to the application.
+
+Swagger: a web interface to XNAT's API.
 
 
 
