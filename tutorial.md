@@ -1,4 +1,4 @@
-# Getting Started with XNAT's Container Service By Writing and Launching Commands: A Tutorial
+# Getting Started with XNAT's Container Service: Writing Commands and Launching Containers
 
 ## Table of Contents
   [What You Need Before You Begin](#what-you-need-before-you-begin)  
@@ -96,7 +96,7 @@ Navigate to Administer -> Plugin Settings -> Images and Commands.  Press the but
     "xnat": [
       {
         "name": "hello-world-wrapper",
-        "description": "print hello world"}
+        "description": "echo Hello world"}
     ]
 }
 ```
@@ -178,84 +178,49 @@ This JSON object tells us that our API request was successful and that we launch
 
 ## Investigating the Command History
 
+Navigate to Administer -> Plugin Settings -> Command History
+
+You should see your newly executed command.  Click on the command description to get more information about what happened at execution time.  
 
 
+![Command History](CommandHistory.png)
+
+You should see a table that looks something like this:
+
+ Key	| Value 
+ --- | ----- 
+ id	| 83 |
+command-id | 26
+status	| Complete
+status-time	 | 1526395805313
+wrapper-id	| 35
+container-id	| 7c76f2a366fe81fd67ac28bfefab7aa08fc35969e119b18277137d1472b8344b
+workflow-id	 | null
+user-id	| admin
+swarm	| false
+service-id	| null
+task-id	| null
+node-id	| null
+docker-image	| xnat/dcm2niix:latest
+command-line	| echo Hello world
+override-entrypoint	| null
+working-directory	| null
+subtype	| docker
+parent-source-object-name	| null
+env	| {"XNAT_USER":"51d0ddc5-e027-4177-bed9-74577507d9db","XNAT_HOST":"http://10.1.1.17","XNAT_PASS":"******"}
+ports	| {}
+mounts	
+inputs	| {"id":440,"type":"command","name":"my_cool_input","value":"Hello world"}
+outputs	
+history	| {"id":396,"status":"Created","entity-type":"user","entity-id":"admin","time-recorded":1526395800062}  {"id":397,"status":"create","entity-type":"event","time-recorded":1526395805207,"external-timestamp":"1526395800057904581"} {"id":398,"status":"start","entity-type":"event","time-recorded":1526395805229,"external-timestamp":"1526395800335165881"} {"id":399,"status":"die","entity-type":"event","time-recorded":1526395805251,"external-timestamp":"1526395800418540450","exitCode":"0"}
+log-paths	| /data/xnat/archive/CONTAINER_EXEC/20180515_145005/LOGS/stdout.log
+reserve-memory	| null
+limit-memory	| null
+limit-cpu	| null
+
+Of particular interest
 
 
-
-
-
-
-## Our First GET Request
-
-In order to use any route that has {wrapperId} in it we need to know the wrapper id.  Wrapper ids and command ids are set internally by XNAT in its database.  There's a way to find the command id in XNAT's web interface.  Once you've saved the command, open it back up again.  You'll see the command id in the upper left corner. (Your command id will likely be different from the one pictured.)
-
-![an image of the command ID](CommandID.png)
-
-I don't know of a way to find the wrapper id through the XNAT's web interface, but you can do it via a GET request through the Swagger UI.  
-
-Having noted the command ID, go to the Swagger UI and scroll to the command-rest-api.  We're going to send a GET request to the `/xapi/commands/{id}` route.  Click on that route to expand it.  There's only one piece of information we have to supply, and that's the command ID.  Enter the command ID you found in the previous step, and then click Try It Out!
-
-![making a GET request](GettingWrapperID.png)
-
-You should get a response with a code of 200 (that means "success") body that looks something like:
-
-```
-{
-  "id": 25,
-  "name": "hello-world",
-  "label": null,
-  "description": "Prints a string to stdout",
-  "version": null,
-  "schema-version": null,
-  "info-url": null,
-  "image": "brainlife/fsl:latest",
-  "type": "docker",
-  "index": null,
-  "hash": null,
-  "working-directory": null,
-  "command-line": "echo #my_cool_input#",
-  "override-entrypoint": null,
-  "mounts": [],
-  "environment-variables": {},
-  "ports": {},
-  "inputs": [
-    {
-      "name": "my_cool_input",
-      "description": "The string that will be printed",
-      "type": "string",
-      "matcher": null,
-      "default-value": "Hello world",
-      "required": false,
-      "replacement-key": null,
-      "command-line-flag": null,
-      "command-line-separator": null,
-      "true-value": null,
-      "false-value": null
-    }
-  ],
-  "outputs": [],
-  "xnat": [
-    {
-      "id": 34,
-      "name": "hello-world-wrapper",
-      "description": null,
-      "contexts": [],
-      "external-inputs": [],
-      "derived-inputs": [],
-      "output-handlers": []
-    }
-  ],
-  "reserve-memory": null,
-  "limit-memory": null,
-  "limit-cpu": null
-}
-```
-This JSON object describes our command.  To get the wrapper id specifically, look at the array that follows the "xnat" key.  The first object in that array is our wrapper, and in this case its id is 34.  Your wrapper id will probably differ.
-
-## Launching a Container Via cURL
-
-This tutorial is going to assume that you have installed cURL -- if not, search for how to install cURL for your OS.  Or, if you don't want to, skip to the next section.
 
 
 
