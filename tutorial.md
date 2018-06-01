@@ -1,12 +1,16 @@
-# XNAT's Container Service: a Tutorial
+# Getting Started with XNAT's Container Service By Writing and Launching Commands: A Tutorial
 
 ## Table of Contents
-  [What You Need Before You Begin](#what-you-need-before-you-begin)
+  [What You Need Before You Begin](#what-you-need-before-you-begin)  
   [Installing the Container Service Plugin](#installing-the-container-service-plugin)  
   [Installing Images for the Container Service](#installing-images-for-the-container-service)  
   [Setting Up a First Command](#setting_up_a_first_command)  
   [Launching a Container](#launching_a_container)  
   [Glossary](#glossary)  
+
+## What This Tutorial Covers
+
+This tutorial is a walk-through from installing the Container Service plugin through writing commands that take multiple images as inputs and mount multiple outputs in XNAT, endeavoring to explain enough about XNAT CS functionality to enable the person who completes the tutorial to write their own commands for their own needs.  It assumes some basic familiarity with command line interfaces, but not more than that.  
 
 ## What You Need Before You Begin
 
@@ -70,7 +74,7 @@ The image should begin downloading.  When it completes, if you navigate to Admin
 
 ## Setting Up a First Command
 
-XNAT requires information about what command-line instruction to send to the Docker container, what inputs that process expects, and how to process any outputs, if outputs are expected.  We give this information to XNAT in a JSON object called the command.  We'll start with the "Hello, World" of commands, adapted from the [official documentation](https://wiki.xnat.org/display/CS/Command).  
+XNAT requires information about what command-line instruction to send to the Docker container, what inputs that process expects, and how to process any outputs, if outputs are expected.  We give this information to XNAT in a JSON object called the command.  We'll start with the "Hello, World" of commands, adapted from the [official documentation](https://wiki.xnat.org/display/CS/Command). This command allows us to launch a container that will print "Hello world" (or anything else) to standard out.
 
 Navigate to Administer -> Plugin Settings -> Images and Commands.  Press the button `Add New Command` next to the listing for the brainlife/fsl image.  Copy and paste the following JSON object into the box that pops up (you can paste over the braces that are there by default), and click `Save Command`.
 
@@ -88,21 +92,176 @@ Navigate to Administer -> Plugin Settings -> Images and Commands.  Press the but
             "type": "string",
             "default-value": "Hello world"
         }
+    ],
+    "xnat": [
+      {
+        "name": "hello-world-wrapper",
+        "description": "print hello world"}
     ]
 }
 ```
 
-The entry for `command-line` in the JSON object is, unusually intuitively for this context, the code that will actually be executed at the command prompt of your docker container.  However, the string in hash marks won't be executed verbatim.  Instead, it will be matched with an input replacement key from one of the members of the list of inputs (the array that's the value for the key `inputs`).  You can specify an input replacement key, but by default every input has an input replacement key `#<input-name>#`. So `"echo #my_cool_input#"` will actually send to the command line the instruction to echo whatever the value of the input `my_cool_input` is.  We can see the default value is set to "Hello world", though we will see how to launch a container with other values in the next section.  
+After you've saved your command, you can see it available under the list of commands for your image.
 
-## Launching a Container
+![List of Commands](NewCommandAdded.png)  
 
-Commands in XNAT are launched via the REST API.  A REST API is a set of conventions wherein a program (here, the container service) can send requests to a application (here, the XNAT instance) via a URI (route), and the program responds.  In this case, all the requests we will send will be POST requests.  That means we will be sending some information along with the URI which gives the the application additional information.  
+The entry for `command-line` in the JSON object is, unusually intuitively for this context, the code that will actually be executed at the command prompt of your docker container.  However, the string in hash marks won't be executed verbatim.  Instead, it will be matched with an input replacement key from one of the members of the list of inputs (the array that's the value for the key `inputs`).  You can specify an input replacement key, but by default every input has an input replacement key `#<input-name>#`. So `"echo #my_cool_input#"` will actually send to the command line the instruction to echo whatever the value of the input `my_cool_input` is.  We can see the default value is set to "Hello world", though we will see how to launch a container with other values in the next section.
 
-If you are familiar with REST, you know that there are lots of ways to make REST requests: curl, Postman,and the Python requests library are all options that could make sense in this context.  In this tutorial, we will be using the Swagger web interface to the API provided by XNAT. The subset of XNAT's API that you access with Swagger are the routes that trigger internal XNAT functions.  All these routes start with `/xapi`.  The URL of the Swagger interface is `http://<xnat-instance-url>/xapi/swagger-ui.html`. If you are running the Vagrant XNAT instance locally that URL is (http://10.1.1.17/xapi/swagger-ui.html).  
+Another element we'll see more of is the wrapper. That's the object you see in the list after the "xnat" key. A wrapper contains information that helps XNAT use its internal information to provide files and strings for inputs, and to process outputs.  This information would not available to the docker container, which only knows what it got from its image or what it learns when it's run.  There's no internal XNAT information to call on in this simple example, but we need a wrapper name or ID in order to launch a container, and the wrapper description is necessary so that we can more easily look at our output in the XNAT web interface.*
+
+## Interacting With the REST API
+
+Commands in XNAT are launched via the REST API.  A REST API is a set of conventions wherein a program (here, the container service) can send requests to a application (here, the XNAT instance) via a URI (route), and the program responds.  All the requests we send to launch containers will be POST requests.  That means we will be sending some information along with the URI which gives the the application additional information. In this tutorial, we will also make one GET request, which requests information from the application.  
+
+If you are familiar with REST, you know that there are lots of ways to make REST requests: cURL, Postman,and the Python requests library are all options that could make sense in this context. In this tutorial, we will be mostly be using the Swagger web interface to the API provided by XNAT.  The subset of XNAT's API that you access with Swagger are the routes that trigger internal XNAT functions.  All these routes start with `/xapi`.  The URL of the Swagger user interface is `http://<xnat-instance-url>/xapi/swagger-ui.html`. If you are running the Vagrant XNAT instance locally that URL is (http://10.1.1.17/xapi/swagger-ui.html).  
 
 ![an image of the Swagger web interface](Swagger.png)
 
-We are going to launch a container, so we scroll down to `launch-rest-api` 
+The Swagger interface also acts as a directory of the routes available to us. (Another source of documentation is available [here](https://wiki.xnat.org/display/CS/Container+Service+API).)  We are going to launch a container, so we scroll down to `launch-rest-api` and click on it to expand it.  We can see now why we need a wrapper.  All the routes require a wrapper name or a wrapper id. For example, 
+
+`POST /xapi/projects/{project}/wrapper/{wrapperId}/launch`
+
+has two variables, indicated by the placeholders in braces, that would need to be supplied by us, project and wrapperId. 
+
+Another small complexity is that, at least in the current out-of-the-box Vagrant VM installation of XNAT you'll notice that some of the routes have the note "Does not work properly in Swagger UI."  All the routes that *do* work through the Swagger UI require a project. This doesn't seem to be a problem in at least some other XNAT installations.  In this tutorial, we'll work around the problem by supplying a project name, even when it shouldn't be strictly necessary.
+
+## Running Our Hello World Command
+
+We'll make a project.  Go to New -> Project.
+
+Fill out the values for Project Title, Running Title, and Project ID as follows:
+
+Project Title: Container Service Tutorial Project
+Running Title: CS_TUTORIAL
+Project ID: CS_TUTORIAL
+
+![New Project Form](NewProject.png)
+
+Now that we have a project id, we can use the following route to launch our command.  
+
+`POST /xapi/projects/{project}/commands/{commandId}/wrappers/{wrapperName}/launch`
+
+Scroll down to this route on the Swagger UI page and click on the route to expand it.  
+
+![Project CommandId Wrapper Route](ProjectCommandIdWrapperRoute.png)
+
+We need to supply three pieces of information: the project ID, the command ID, and the wrapper name. We just gave our project an ID: CS_TUTORIAL.  
+
+You can get the command ID from in XNAT's web interface.  Once you've saved the command, open it back up again.  You'll see the command ID in the upper left corner. (Your command ID will likely be different from the one pictured.)
+
+![an image of the command ID](CommandID.png)
+
+The wrapper name we assigned in the command in the Setting Up a First Command Section: hello-world-wrapper
+
+This POST request is unusual in that it does not need any parameters in the request body.  Right now we are only printing the default value of the input to standard out, so we don't need to pass it any further information.  We can use an empty object as our request body.
+
+We can assign these values in the Swagger UI and click Try It Out! to launch our container.
+
+![Hello World POST request](HelloWorldParams.png)
+
+You should get a response code of 200, and a response body that looks something like this:
+
+```
+{
+  "status": "success",
+  "params": {},
+  "command-id": 25,
+  "wrapper-id": 34,
+  "container-id": "512da6dd3efa5620f437a52c367ae3cff89c741d17d8794a35acadbc29507a89",
+  "type": "container"
+}
+```
+
+(Troubleshooting note: did you get a bunch of HTML in your response body instead of a JSON object?  It may be because your authentication timed out in XNAT.  Make sure you are logged in to XNAT in the same browser as your Swagger UI window.)
+
+This JSON object tells us that our API request was successful and that we launched a container.  But how do we get information about whether it worked?
+
+## Investigating the Command History
+
+
+
+
+
+
+
+
+
+## Our First GET Request
+
+In order to use any route that has {wrapperId} in it we need to know the wrapper id.  Wrapper ids and command ids are set internally by XNAT in its database.  There's a way to find the command id in XNAT's web interface.  Once you've saved the command, open it back up again.  You'll see the command id in the upper left corner. (Your command id will likely be different from the one pictured.)
+
+![an image of the command ID](CommandID.png)
+
+I don't know of a way to find the wrapper id through the XNAT's web interface, but you can do it via a GET request through the Swagger UI.  
+
+Having noted the command ID, go to the Swagger UI and scroll to the command-rest-api.  We're going to send a GET request to the `/xapi/commands/{id}` route.  Click on that route to expand it.  There's only one piece of information we have to supply, and that's the command ID.  Enter the command ID you found in the previous step, and then click Try It Out!
+
+![making a GET request](GettingWrapperID.png)
+
+You should get a response with a code of 200 (that means "success") body that looks something like:
+
+```
+{
+  "id": 25,
+  "name": "hello-world",
+  "label": null,
+  "description": "Prints a string to stdout",
+  "version": null,
+  "schema-version": null,
+  "info-url": null,
+  "image": "brainlife/fsl:latest",
+  "type": "docker",
+  "index": null,
+  "hash": null,
+  "working-directory": null,
+  "command-line": "echo #my_cool_input#",
+  "override-entrypoint": null,
+  "mounts": [],
+  "environment-variables": {},
+  "ports": {},
+  "inputs": [
+    {
+      "name": "my_cool_input",
+      "description": "The string that will be printed",
+      "type": "string",
+      "matcher": null,
+      "default-value": "Hello world",
+      "required": false,
+      "replacement-key": null,
+      "command-line-flag": null,
+      "command-line-separator": null,
+      "true-value": null,
+      "false-value": null
+    }
+  ],
+  "outputs": [],
+  "xnat": [
+    {
+      "id": 34,
+      "name": "hello-world-wrapper",
+      "description": null,
+      "contexts": [],
+      "external-inputs": [],
+      "derived-inputs": [],
+      "output-handlers": []
+    }
+  ],
+  "reserve-memory": null,
+  "limit-memory": null,
+  "limit-cpu": null
+}
+```
+This JSON object describes our command.  To get the wrapper id specifically, look at the array that follows the "xnat" key.  The first object in that array is our wrapper, and in this case its id is 34.  Your wrapper id will probably differ.
+
+## Launching a Container Via cURL
+
+This tutorial is going to assume that you have installed cURL -- if not, search for how to install cURL for your OS.  Or, if you don't want to, skip to the next section.
+
+
+
+
+
+
 
 
 
@@ -123,6 +282,9 @@ Input Replacement Key: a string in the command-line value of the command that wi
 REST API: a set of conventions wherein a program can send requests to a application via a URI to either get information from the application's back end, or to provide data to the application.
 
 Swagger: a web interface to XNAT's API.
+
+
+* The example given in the documentation does not include an XNAT wrapper, but in practice I don't know how that example can be launched. All current routes in the REST API require a wrapper name or wrapper id.  
 
 
 
