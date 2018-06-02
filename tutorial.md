@@ -1,6 +1,7 @@
 # Getting Started with XNAT's Container Service: Writing Commands and Launching Containers
 
 ## Table of Contents
+  [What This Tutorial Covers](#)
   [What You Need Before You Begin](#what-you-need-before-you-begin)  
   [Installing the Container Service Plugin](#installing-the-container-service-plugin)  
   [Installing Images for the Container Service](#installing-images-for-the-container-service)  
@@ -123,7 +124,7 @@ The Swagger interface also acts as a directory of the routes available to us. (A
 
 has two variables, indicated by the placeholders in braces, that would need to be supplied by us, project and wrapperId. 
 
-Another small complexity is that, at least in the current out-of-the-box Vagrant VM installation of XNAT you'll notice that some of the routes have the note "Does not work properly in Swagger UI."  All the routes that *do* work through the Swagger UI require a project. This doesn't seem to be a problem in at least some other XNAT installations.  In this tutorial, we'll work around the problem by supplying a project name, even when it shouldn't be strictly necessary.
+Another small complexity is that, at least in the current version of XNAT, 1.7.4.1, you'll notice that some of the routes have the note "Does not work properly in Swagger UI."  All the routes that *do* work through the Swagger UI require a project. We'll work around this by supplying a project, even if it shouldn't be strickly necessary.  It's also possible that if you are using 1.7.4.1, you'll find that a different set of routes work then the ones assumed to work in this tutorial (see [here](https://groups.google.com/forum/#!topic/xnat_discussion/ePwqyr3OmLs) for a discussion of why)
 
 ## Running Our Hello World Command
 
@@ -159,7 +160,7 @@ We can assign these values in the Swagger UI and click Try It Out! to launch our
 
 ![Hello World POST request](HelloWorldParams.png)
 
-You should get a response code of 200, and a response body that looks something like this:
+You should get a response code of 201, and a response body that looks something like this:
 
 ```
 {
@@ -218,8 +219,23 @@ reserve-memory	| null
 limit-memory	| null
 limit-cpu	| null
 
-Of particular interest
+Of particular interest are the entries `command-line` which tells us what our container actually ran at its shell prompt, our `inputs`, which we currently have one of, with the name `my-cool-input` and the value "Hello world", and our `log-paths`, which is where on our XNAT server that we'll find anything that got printed to our container's standard out.  The web interface also makes that information available; click on View StdOut.log to see what we printed.  
 
+![Standard Out Button](StdOut.png)
+
+It should say "Hello world".  
+
+## Changing the Input
+
+What if we wanted to print something else to standard out.  We don't have to change our command.  Instead, because our command knows that it takes an input, we can send that input with our POST request as a value in the request body.  Try typing making your request again, but this time entering `{"my_cool_input":"Hello Pluto"}` in the allRequestParams box in the Swagger UI.  Now when you go to Command History -> description for your most execution -> View StdOut.log, you'll see "Hello Pluto".
+
+(XNAT is finicky, and occastionally Command History decides not to display.  I find that creating and deleting a command from the Images and Commands display can make it show up again.)
+
+If you want to do an exercise to make sure you've mastered XNAT commands thus far, see if you can write a command that takes a directory name as an input and then uses `ls` to print the contents of that directory to standard out.
+
+## Error Logging
+
+If you did the exercise in the previous sec
 
 
 
@@ -245,6 +261,10 @@ Command: a JSON file that gives XNAT the information it needs run processes in a
 Input Replacement Key: a string in the command-line value of the command that will be matched with, and replaced by, a string from an input provided when the container is launched.
 
 REST API: a set of conventions wherein a program can send requests to a application via a URI to either get information from the application's back end, or to provide data to the application.
+
+Standard Err:
+
+Standard Out:
 
 Swagger: a web interface to XNAT's API.
 
