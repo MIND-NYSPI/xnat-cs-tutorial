@@ -6,6 +6,7 @@
   [Installing the Container Service Plugin](#installing-the-container-service-plugin)  
   [Installing Images for the Container Service](#installing-images-for-the-container-service)  
   [Setting Up a First Command](#setting_up_a_first_command)  
+  [Interacting With the REST API](#interaction_with_the_rest_api)
   [Launching a Container](#launching_a_container)  
   [Glossary](#glossary)  
 
@@ -18,7 +19,7 @@ This tutorial is a walk-through from installing the Container Service plugin thr
 This tutorial assumes you have a working XNAT instance. You must have administrator privileges on your XNAT instance to use the Container Service.  If you are not sure how to set up an XNAT instance and would like a quick way to get up and running, the one-line XNAT VM setup described [here](https://wiki.xnat.org/display/XNAT17/Running+XNAT+in+a+Vagrant+Virtual+Machine) is a quick way to get started.  If you've installed the prerequisites and executed that line of code, your XNAT web interface should be available in your browser at 10.1.1.17, login: admin and password: admin.
 
 
-## Installing the Container Service plugin
+## Installing the Container Service Plugin
 
 Download the .jar file of the “Latest Release” on this page to `<xnat-home>/plugins` and restart the tomcat server.
 
@@ -63,15 +64,13 @@ docker login
 ```
 and sign in with your credentials.  
 
-You can build your own Docker image, but you can also find many publically available images at [Docker Hub](https://hub.docker.com/).  Sign in with the same credentials you used to log in to Docker on your XNAT server.  This tutorial will use the [brainlife/fsl image](https://hub.docker.com/r/brainlife/fsl/), since we are going to move on to running FSL processes. To pull this image to your machine, 
+You can build your own Docker image, but you can also find many publically available images at [Docker Hub](https://hub.docker.com/).  Sign in with the same credentials you used to log in to Docker on your XNAT server.  This tutorial will first use the [xnat/dcm2niix image](https://hub.docker.com/r/xnat/dcm2niix/), and then later move to an image with FSL installed. To pull this the dcm2niix image to your machine, 
 
 ```
-docker pull brainlife/fsl
+docker pull xnat/dcm2niix
 ```
 
-If instead you needed to run another program, like SPM, you could search Docker Hub for an image with SPM installed, or build your own image.  
-
-The image should begin downloading.  When it completes, if you navigate to Administer -> Plugin Settings -> Images & Commands, you should see listed `brainlife/fsl:latest`. 
+The image should begin downloading.  When it completes, if you navigate to Administer -> Plugin Settings -> Images & Commands, you should see listed `xnat/dcm2niix:latest`. 
 
 ## Setting Up a First Command
 
@@ -229,13 +228,140 @@ It should say "Hello world".
 
 What if we wanted to print something else to standard out.  We don't have to change our command.  Instead, because our command knows that it takes an input, we can send that input with our POST request as a value in the request body.  Try typing making your request again, but this time entering `{"my_cool_input":"Hello Pluto"}` in the allRequestParams box in the Swagger UI.  Now when you go to Command History -> description for your most execution -> View StdOut.log, you'll see "Hello Pluto".
 
-(XNAT is finicky, and occastionally Command History decides not to display.  I find that creating and deleting a command from the Images and Commands display can make it show up again.)
+(XNAT troubleshooting: occasionally Command History decides not to display.  I find that creating and deleting a command from the Images and Commands display can make it show up again.)
 
-If you want to do an exercise to make sure you've mastered XNAT commands thus far, see if you can write a command that takes a directory name as an input and then uses `ls` to print the contents of that directory to standard out.
+If you want to do an exercise to make sure you've mastered XNAT commands thus far, before you move on, see if you can write a command that takes a directory name as an input and then uses `ls` to print the contents of that directory to standard out.
 
 ## Error Logging
 
-If you did the exercise in the previous sec
+If you did the exercise in the previous section and accidentally or on purpose you passed the command a directory that didn't exist, you may have already seen that some command executions generate a StdErr.log, which is accessible from a button in the same location as StdOut.log.  If you haven't yet seen that
+
+Take this line
+
+`"command-line": "echo #my_cool_input#",`
+
+ahd change it to
+
+`"command-line": "ls foo",`
+
+Now you should see the StdErr.log reads `ls: cannot access foo: No such file or directory`.
+
+(XNAT troubleshooting: sometimes XNAT gets itself into a state where it can't save edits to a command.  Sometimes it appears to spontaneously reorder elements of a command you've written, which in some cases can damage functionality.  When that happens you can copy your command, delete the existing command, and add a new command with your edits.) 
+
+## A First Command With Imaging Inputs
+
+We are on XNAT to do neuroimaging, are we not?  The next step in getting to command mastery is to see if you can execute a command that takes neuroimaging inputs and outputs.  The XNAT team has already written a command to execute dcm2niix, and it was for that reason that we pulled the dcm2niix image.  
+
+Here's the command (you can also find it [here](https://github.com/NrgXnat/docker-images/blob/master/dcm2niix/command.json)):
+
+```
+{
+    "name": "dcm2niix",
+    "description": "Runs dcm2niix",
+    "info-url": "https://github.com/rordenlab/dcm2niix",
+    "version": "1.4",
+    "schema-version": "1.0",
+    "type": "docker",
+    "image": "xnat/dcm2niix",
+    "command-line": "dcm2niix [BIDS] [OTHER_OPTIONS] -o /output /input",
+    "mounts": [
+        {
+            "name": "dicom-in",
+            "writable": "false",
+            "path": "/input"
+        },
+        {
+            "name": "nifti-out",
+            "writable": "true",
+            "path": "/output"
+        }
+    ],
+    "inputs": [
+        {
+            "name": "bids",
+            "description": "Create BIDS metadata file",
+            "type": "boolean",
+            "required": false,
+            "default-value": false,
+            "replacement-key": "[BIDS]",
+            "command-line-flag": "-b",
+            "true-value": "y",
+            "false-value": "n"
+        },
+        {
+            "name": "other-options",
+            "description": "Other command-line flags to pass to dcm2niix",
+            "type": "string",
+            "required": false,
+            "replacement-key": "[OTHER_OPTIONS]"
+        }
+    ],
+    "outputs": [
+        {
+            "name": "nifti",
+            "description": "The nifti files",
+            "mount": "nifti-out",
+            "required": "true"
+        }
+    ],
+    "xnat": [
+        {
+            "name": "dcm2niix-scan",
+            "description": "Run dcm2niix on a Scan",
+            "contexts": ["xnat:imageScanData"],
+            "external-inputs": [
+                {
+                    "name": "scan",
+                    "description": "Input scan",
+                    "type": "Scan",
+                    "required": true,
+                    "matcher": "'DICOM' in @.resources[*].label"
+                }
+            ],
+            "derived-inputs": [
+                {
+                    "name": "scan-dicoms",
+                    "description": "The dicom resource on the scan",
+                    "type": "Resource",
+                    "derived-from-wrapper-input": "scan",
+                    "provides-files-for-command-mount": "dicom-in",
+                    "matcher": "@.label == 'DICOM'"
+                }
+            ],
+            "output-handlers": [
+                {
+                    "name": "nifti-resource",
+                    "accepts-command-output": "nifti",
+                    "as-a-child-of-wrapper-input": "scan",
+                    "type": "Resource",
+                    "label": "NIFTI"
+                }
+            ]
+        }
+    ]
+}
+``` 
+
+Add this command to the dcm2niix image under Images & Commands.
+
+## Mounts, Inputs, and Outputs
+
+Here are some things to pay attention to:
+
+1. In our `command-line` entry, there are now some values in brackets, "[BIDS]" and "[OPTIONS]".  Those are input replacement keys.  This command doesn't use the default for a replacement key, the name of the inputs surrounded by hashtags, but instead specifies a custom replacement key.  Under `inputs`, we now have an array of two items, a boolean specifying true or false for BIDS, and a string for any other options we want to pass to dcm2niix.
+
+2. We now have mounts for both input and outpout.  A mount is a location in a file system where external storage can be accessed.  In this case, the file system is our container.  In order for our container to operate on input files from XNAT, they must be mounted within the container.  Similarly, the output files must have a defined location in the container directory tree so that XNAT can access them and move them into its own directory structure.
+
+3. Under the `xnat` key we now have two different kinds of inputs, so there are now three kinds of inputs a command takes.
+
+* The first kind is the input we've already seen: a value, either a string, a Boolean, or a number (?), that goes directly on the command line, replacing a replacement key.  You list these inputs under the `input` key on the top level of the JSON object.  
+
+* The second is external input.  This is the path to an XNAT object.  This path is supplied in the request body when the program (i.e., you, using Swagger or any other client) makes a request. External inputs go in an array under the `external-inputs` key underneath the `xnat` key. 
+
+* The third is derived input.  Derived input are XNAT objects or strings that you get from other XNAT objects by referencing their properties or their children.  We'll go into more detail about this in a bit.  Since really all the container knows about are what it executes from the command line and what files it has mounted, your derived input needs at some point to be mounted or translated into the first kind of input to be used.  This kind of input is stored in an array under the `derived-inputs` key underneath the `xnat` key.  The way the developers think about it, the information under the `xnat` key, that is, the wrapper, wraps around the container and allows it to communicate with XNAT.  It's like the container is an old wizard in a cave, and imaging files are enchanted fruits whose enchantment must be broken before they can be eaten, and the wrapper is a spell that lets the container wizard unlock their true fruit nature.  
+
+4. We also now have outputs.  Similarly, the container wizard is so grateful to the command emissary for bringing her fruits that she offers the emissary 
+
 
 
 
@@ -256,9 +382,15 @@ Docker Hub: a repository with pre-built Docker Images.
 
 Docker Image: an image is a snapshot of a machine that has the capacity to run processes.  It form the basis for a Docker container. 
 
-Command: a JSON file that gives XNAT the information it needs run processes in a Docker Container. 
+Command: a JSON file that gives XNAT the information it needs run processes in a Docker Container.
+
+Derived Input:
+
+External Input: 
 
 Input Replacement Key: a string in the command-line value of the command that will be matched with, and replaced by, a string from an input provided when the container is launched.
+
+Mounts
 
 REST API: a set of conventions wherein a program can send requests to a application via a URI to either get information from the application's back end, or to provide data to the application.
 
