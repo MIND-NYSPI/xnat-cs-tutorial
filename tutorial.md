@@ -11,6 +11,16 @@
   [Investigating the Command History](./tutorial_part1.md#investigating-the-command-history)  
   [Changing the Input](./tutorial_part1.md#changing-the-input)    
   [Error Logging](./tutorial_part1.md#error-logging)  
-## Part 2. Manipulating Data from XNAT: dcm2niix
+
+## [Part 2. Manipulating Data from XNAT: dcm2niix](./tutorial_part2.md)
+  [A First Command With Imaging Inputs](./tutorial_part2.md#a-first-command-with-imaging-inputs)  
+  [Mounts, Inputs, and Outputs](./tutorial_part2.md#mounts-inputs-and-outputs)  
+  [A Simile Involving a Wizard You Can Skip If It's Confusing](./tutorial_part2.md#a-simile-involving-a-wizard-you-can-skip-if-its-confusing)  
+  [A Closer Look at Mounts](./tutorial_part2.md#a-closer-look-at-mounts)  
+  [XNAT's Data Organization](./tutorial_part2.md#xnats-data-organization)  
+  [A Closer Look at Wrapper Inputs](./tutorial_part2.md#a-closer-look-at-wrapper-inputs)  
+  [Output Handling](./tutorial_part2.md#output-handling)  
+  [One Common Error](./tutorial_part2.md#one-common-error)
+  
 ## Part 3. Accepting Arbitrary Inputs and Outputs: FSL Operations
 ## Glossary
