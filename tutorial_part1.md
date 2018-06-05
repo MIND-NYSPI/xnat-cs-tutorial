@@ -3,16 +3,16 @@
 ## Part 1. Installing the Container Service and Executing a Command: Hello, World. 
 
 ### Table of Contents
-  [What This Tutorial Covers](#)
+  [What This Tutorial Covers](#waht)  
   [What You Need Before You Begin](#what-you-need-before-you-begin)  
   [Installing the Container Service Plugin](#installing-the-container-service-plugin)  
   [Installing Images for the Container Service](#installing-images-for-the-container-service)  
-  [Setting Up a First Command](#setting_up_a_first_command)  
-  [Interacting With the REST API](#interaction_with_the_rest_api)  
-  [Running Our Hello World Command](#running_our_hello_world_command)  
-  [Investigating the Command History](#investigating_the_command_history)  
-  [Changing the Input](#changing_the_input)    
-  [Error Logging](#error_logging)  
+  [Setting Up a First Command](#setting-up-a-first-command)  
+  [Interacting With the REST API](#interaction-with-the-rest-api)  
+  [Running Our Hello World Command](#running-our-hello-world-command)  
+  [Investigating the Command History](#investigating-the-command-history)  
+  [Changing the Input](#changing-the-input)    
+  [Error Logging](#error-logging)  
   [Glossary](#glossary)  
 
 ### What This Tutorial Covers
