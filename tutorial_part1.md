@@ -1,4 +1,3 @@
-# Getting Started with XNAT's Container Service: a Tutorial
 
 ## Part 1. Installing the Container Service and Executing a Command: Hello, World. 
 
