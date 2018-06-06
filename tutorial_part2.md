@@ -216,7 +216,7 @@ So the external input, the thing the program (in other words, us at the Swagger 
 
 Where is the `/data` prefix you ask?  Good question!  When providing API routes to XNAT you leave off the prefix.  There's no clear reason why.
 
-The matcher is a piece of syntax JSON filter.  It forms as a check and a winnower.   
+The matcher is a piece of syntax know as a [JSONPath filter](https://wiki.xnat.org/display/CS/Command#Command-jsonpath-filters)  It forms as a check and a winnower.   
 
 The matcher on scan is 
 

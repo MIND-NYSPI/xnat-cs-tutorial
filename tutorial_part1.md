@@ -1,8 +1,11 @@
 
+[Home](./tutorial.
+md)
+
 ## Part 1. Installing the Container Service and Executing a Command: Hello, World. 
 
 ### Table of Contents
-  [What This Tutorial Covers](#waht)  
+  [What This Tutorial Covers](#what-this-tutorial-covers)  
   [What You Need Before You Begin](#what-you-need-before-you-begin)  
   [Installing the Container Service Plugin](#installing-the-container-service-plugin)  
   [Installing Images for the Container Service](#installing-images-for-the-container-service)  
@@ -22,7 +25,6 @@ This tutorial is a walk-through from installing the Container Service plugin thr
 
 This tutorial assumes you have a working XNAT instance. You must have administrator privileges on your XNAT instance to use the Container Service.  If you are not sure how to set up an XNAT instance and would like a quick way to get up and running, the one-line XNAT VM setup described [here](https://wiki.xnat.org/display/XNAT17/Running+XNAT+in+a+Vagrant+Virtual+Machine) is a quick way to get started.  If you've installed the prerequisites and executed that line of code, your XNAT web interface should be available in your browser at 10.1.1.17, login: admin and password: admin.
 
-
 ### Installing the Container Service Plugin
 
 Download the .jar file of the “Latest Release” on this page to `<xnat-home>/plugins` and restart the tomcat server.
@@ -34,11 +36,13 @@ In more detail:
    If you are using the Vagrant VM standard setup described above, this is how you get to your home directory on the virtual machine (and give yourself write permission):
 
    ```
-   cd <xnat-installation-directory>xnat-vagrant/configs/xnat-release
+   cd <xnat-installation-directory>/xnat-vagrant/configs/xnat-release
    vagrant ssh
    sudo -i
    ```
+
    Now you should have a `root@xnat-release` command prompt.  Finally
+
    ```
    cd /data/xnat/home/plugins
    ```
@@ -57,7 +61,7 @@ In your XNAT home directory, you can download it with:
 
 ### Installing Images for the Container Service  
 
-The Container Service currently uses Docker.  That means that your containers will be based on Docker Images.  The first step in running a process via the container service is to pull or create a Docker Image.  Your Docker Images and Containers do not have to live on the same machine as your XNAT instance.  However, configuring the Container Service to listen to a remote server for new Docker Images is beyond the current scope of this tutorial; we will pull Docker Images to the machine that hosts our XNAT instance.  
+The Container Service currently uses Docker.  That means that your containers will be based on Docker images.  The first step in running a process via the container service is to pull or create a Docker image.  Your Docker images and containers do not have to live on the same machine as your XNAT instance.  However, configuring the container service to listen to a remote server for new Docker images is beyond the current scope of this tutorial; we will pull Docker images to the machine that hosts our XNAT instance.  
 
 If you have not already, create an account on Docker.com.
 
@@ -74,13 +78,21 @@ You can build your own Docker image, but you can also find many publically avail
 docker pull xnat/dcm2niix
 ```
 
-The image should begin downloading.  When it completes, if you navigate to Administer -> Plugin Settings -> Images & Commands, you should see listed `xnat/dcm2niix:latest`. 
+The image should begin downloading.  When it completes, if you navigate to **Administer -> Plugin Settings -> Images & Commands**, you should see listed `xnat/dcm2niix:latest`. 
+
+![Navigate to the Container Service](NavigateCS.png)
+
+![Docker Image](Image.png)
 
 ### Setting Up a First Command
 
 XNAT requires information about what command-line instruction to send to the Docker container, what inputs that process expects, and how to process any outputs, if outputs are expected.  We give this information to XNAT in a JSON object called the command.  We'll start with the "Hello, World" of commands, adapted from the [official documentation](https://wiki.xnat.org/display/CS/Command). This command allows us to launch a container that will print "Hello world" (or anything else) to standard out.
 
-Navigate to Administer -> Plugin Settings -> Images and Commands.  Press the button `Add New Command` next to the listing for the xnat/dcm2niix image.  Copy and paste the following JSON object into the box that pops up (you can paste over the braces that are there by default), and click `Save Command`.
+Navigate to **Administer -> Plugin Settings -> Images and Commands**.  Press the button `Add New Command` next to the listing for the xnat/dcm2niix image. 
+
+![Add New Command](AddNewCommand.png)
+
+ Copy and paste the following JSON object into the box that pops up (you can paste over the braces that are there by default), and click `Save Command`.
 
 ```
 {
@@ -238,9 +250,7 @@ If you want to do an exercise to make sure you've mastered XNAT commands thus fa
 
 ### Error Logging
 
-If you did the exercise in the previous section and accidentally or on purpose you passed the command a directory that didn't exist, you may have already seen that some command executions generate a StdErr.log, which is accessible from a button in the same location as StdOut.log.  If you haven't yet seen that
-
-Take this line
+If you did the exercise in the previous section and accidentally or on purpose you passed the command a directory that didn't exist, you may have already seen that some command executions generate a StdErr.log, which is accessible from a button in the same location as StdOut.log.  If you haven't yet seen that, take this line
 
 `"command-line": "echo #my_cool_input#",`
 
@@ -276,9 +286,9 @@ Now you should see the StdErr.log reads `ls: cannot access foo: No such file or 
 
 ### Glossary
 
- Command: a JSON file that gives XNAT the information it needs run processes in a Docker Container.
+Command: a JSON file that gives XNAT the information it needs to run processes in a Docker Container.
 
- Derived Input:
+Derived Input: one of the two kinds of wrapper inputs.  It is an XNAT object that is not passed to the API in a post request, but whose API 
 
 Docker Container: a specific instance of a machine, derived from a Docker Image.  Docker containers can run processes.
 
@@ -286,31 +296,29 @@ Docker Hub: a repository with pre-built Docker Images.
 
 Docker Image: an image is a snapshot of a machine that has the capacity to run processes.  It form the basis for a Docker container. 
 
+Experiment: in the XNAT context, experiment is what we might elsewhere call a session -- an object representing the discrete period of time the participant was in the lab and completed one or more scans. It is the level of organization between Project and Scan
 
-Experiment: 
-
-External Input: 
+External Input: one of the two kinds of wrapper inputs. It is a path to an XNAT object, passed to the REST API in a POST request.  
 
 Input Replacement Key: a string in the command-line value of the command that will be matched with, and replaced by, a string from an input provided when the container is launched.
 
-Matcher
+Matcher: a [JSONPath filter](https://wiki.xnat.org/display/CS/Command#Command-jsonpath-filters) expression that tells XNAT about the correct characteristics of the derived input.
 
-Mounts
+Mount: a location in a file system where external storage can be accessed.
 
-Resource: in this context, Resource is an 
+Resource: in this context, a resource is an XNAT object that represents a category of files in a scan.  It is the level of organization between Scan and File.  A resource contains files, and can be provided to a mount in a container and act like a directory. 
 
 REST API: a set of conventions wherein a program can send requests to a application via a URI to either get information from the application's back end, or to provide data to the application.
 
-Scan
+Scan: the level of XNAT data organization between Experiment and Resource.  
 
-Standard Err:
+Standard Error (StdErr): the abstract place where a computer sends information about the errors encountered in running a program.  Standard Error can be printed to a screen, saved to a file, etc.  In the case of the container service, it is saved to a log file.
 
-Standard Out:
+Standard Output (StdOut): the abstract place where a computer sends information about the output generated while running a program.  Standard Output can be printed to a screen, saved to a file, etc.  In the case of the container service, it is saved to a log file.
 
 Swagger: a web interface to XNAT's API.
 
 Wrapper: in this context, the part of the command that gives XNAT the information it needs to resolve an API route into mounted directories and files a container can use, and when the container has completed its process, to take output and store it within XNAT's own directory tree.
-
 
 * The example given in the documentation does not include an XNAT wrapper, but in practice I don't know how that example can be launched. All current routes in the REST API require a wrapper name or wrapper id.  
 
