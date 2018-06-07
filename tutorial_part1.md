@@ -1,6 +1,5 @@
 
-[Home](./tutorial.
-md)
+[Home](./tutorial.md)   [Glossary](./tutorial.md#glossary)
 
 ## Part 1. Installing the Container Service and Executing a Command: Hello, World. 
 
@@ -14,8 +13,7 @@ md)
   [Running Our Hello World Command](#running-our-hello-world-command)  
   [Investigating the Command History](#investigating-the-command-history)  
   [Changing the Input](#changing-the-input)    
-  [Error Logging](#error-logging)  
-  [Glossary](#glossary)  
+  [Error Logging](#error-logging)   
 
 ### What This Tutorial Covers
 
@@ -123,7 +121,7 @@ After you've saved your command, you can see it available under the list of comm
 
 The entry for `command-line` in the JSON object is, unusually intuitively for this context, the code that will actually be executed at the command prompt of your docker container.  However, the string in hash marks won't be executed verbatim.  Instead, it will be matched with an input replacement key from one of the members of the list of inputs (the array that's the value for the key `inputs`).  You can specify an input replacement key, but by default every input has an input replacement key `#<input-name>#`. So `"echo #my_cool_input#"` will actually send to the command line the instruction to echo whatever the value of the input `my_cool_input` is.  We can see the default value is set to "Hello world", though we will see how to launch a container with other values in the next section.
 
-Another element we'll see more of is the wrapper. That's the object you see in the list after the "xnat" key. A wrapper contains information that helps XNAT use its internal information to provide files and strings for inputs, and to process outputs.  This information would not available to the docker container, which only knows what it got from its image or what it learns when it's run.  There's no internal XNAT information to call on in this simple example, but we need a wrapper name or ID in order to launch a container, and the wrapper description is necessary so that we can more easily look at our output in the XNAT web interface.*
+Another element we'll see more of is the wrapper. That's the object you see in the list after the "xnat" key. A wrapper contains information that helps XNAT use its internal information to provide files and strings for inputs, and to process outputs.  This information would not available to the docker container, which only knows what it got from its image or what it learns when it's run.  There's no internal XNAT information to call on in this simple example, but we need a wrapper name or ID in order to launch a container, and the wrapper description is necessary so that we can more easily look at our output in the XNAT web interface.[*](#asterisk)
 
 ### Interacting With the REST API
 
@@ -139,7 +137,7 @@ The Swagger interface also acts as a directory of the routes available to us. (A
 
 has two variables, indicated by the placeholders in braces, that would need to be supplied by us, project and wrapperId. 
 
-Another small complexity is that, at least in the current version of XNAT, 1.7.4.1, you'll notice that some of the routes have the note "Does not work properly in Swagger UI."  All the routes that *do* work through the Swagger UI require a project. We'll work around this by supplying a project, even if it shouldn't be strickly necessary.  It's also possible that if you are using 1.7.4.1, you'll find that a different set of routes work then the ones assumed to work in this tutorial (see [here](https://groups.google.com/forum/#!topic/xnat_discussion/ePwqyr3OmLs) for a discussion of why)
+Another small complexity is that, at least in the current version of XNAT, 1.7.4.1, you'll notice that some of the routes have the note "Does not work properly in Swagger UI."  All the routes that *do* work through the Swagger UI require a project. We'll work around this by supplying a project, even if it shouldn't be strickly necessary.  It's also possible that if you are using 1.7.4.1, you'll find that a different set of routes work then the ones assumed to work in this tutorial (see [here](https://groups.google.com/forum/#!topic/xnat_discussion/ePwqyr3OmLs) for a discussion of why.)
 
 ### Running Our Hello World Command
 
@@ -262,74 +260,4 @@ Now you should see the StdErr.log reads `ls: cannot access foo: No such file or 
 
 (XNAT troubleshooting: sometimes XNAT gets itself into a state where it can't save edits to a command.  Sometimes it appears to spontaneously reorder elements of a command you've written, which in some cases can damage functionality.  When that happens you can copy your command, delete the existing command, and add a new command with your edits.) 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-### Glossary
-
-Command: a JSON file that gives XNAT the information it needs to run processes in a Docker Container.
-
-Command Input: the third kind of input, along with the two wrapper inputs.  Command inputs are strings supplied directly to the command line.  They are matched to a position in the command line by the input  replacement key.
-
-Command Line: in this context, the string provided to the container by the command that actually runs at the container's shell prompt.  ("Shell prompt" is another term for command line.  Another way of writing this definition would be to say the command line is what runs at the container's command line.)
-
-Derived Input: one of the two kinds of wrapper inputs.  It is an XNAT object that is not passed to the API in a post request, but whose API 
-
-Docker Container: a specific instance of a machine, derived from a Docker Image.  Docker containers can run processes.
-
-Docker Hub: a repository with pre-built Docker Images.
-
-Docker Image: an image is a snapshot of a machine that has the capacity to run processes.  It form the basis for a Docker container. 
-
-Experiment: in the XNAT context, experiment is what we might elsewhere call a session -- an object representing the discrete period of time the participant was in the lab and completed one or more scans. It is the level of organization between Project and Scan
-
-External Input: one of the two kinds of wrapper inputs. It is a path to an XNAT object, passed to the REST API in a POST request.  
-
-Input Replacement Key: a string in the command-line value of the command that will be matched with, and replaced by, a string from a command input provided when the container is launched.
-
-JSON: a common data format for objects.  The object is represented within curly braces, keys are always strings, and values can be strings, numbers, booleans, arrays, objects, or null.  The command is written in JSON.
-
-Matcher: a [JSONPath filter](https://wiki.xnat.org/display/CS/Command#Command-jsonpath-filters) expression that tells XNAT about the correct characteristics of the derived input.
-
-Mount: a location in a file system where external storage can be accessed.
-
-Object: in programming generally, a data type that can have properties and methods associated with it.  In JSON, a series of key value pairs enclosed in curly braces.  Scan, Resource, and File are examples of first kind of object in XNAT.  The command is a JSON object.
-
-Resource: in this context, a resource is an XNAT object that represents a category of files in a scan.  It is the level of organization between Scan and File.  A resource contains files, and can be provided to a mount in a container and act like a directory. 
-
-REST API: a set of conventions wherein a program can send requests to a application via a URI to either get information from the application's back end, or to provide data to the application.
-
-Scan: the level of XNAT data organization between Experiment and Resource.  
-
-Standard Error (StdErr): the abstract place where a computer sends information about the errors encountered in running a program.  Standard Error can be printed to a screen, saved to a file, etc.  In the case of the container service, it is saved to a log file.
-
-Standard Output (StdOut): the abstract place where a computer sends information about the output generated while running a program.  Standard Output can be printed to a screen, saved to a file, etc.  In the case of the container service, it is saved to a log file.
-
-Swagger: a web interface to XNAT's API.
-
-Wrapper: in this context, the part of the command that gives XNAT the information it needs to resolve an API route into mounted directories and files a container can use, and when the container has completed its process, to take output and store it within XNAT's own directory tree.
-
-* The example given in the documentation does not include an XNAT wrapper, but in practice I don't know how that example can be launched. All current routes in the REST API require a wrapper name or wrapper id.  
-
-
-
-
+<a name="asterisk">*</a> The example given in the documentation does not include an XNAT wrapper, but in practice I don't know how that example can be launched. All current routes in the REST API require a wrapper name or wrapper id. 

@@ -1,0 +1,160 @@
+{
+  "name": "bet-no-hardcode",
+  "label": "bet-derived",
+  "description": "FSLBrainExtractionTool",
+  "version": "1.0",
+  "schema-version": "1.0",
+  "info-url": "https://fsl.fmrib.ox.ac.uk/fsl/fslwiki/BET/UserGuide",
+  "image": "brainlife/fsl:latest",
+  "type": "docker",
+  "index": "https://index.docker.io/v1/",
+  "working-directory": null,
+  "command-line": "bet /input/[FILENAME] /output/sadbrain.nii.gz [OPTIONS]",
+  "override-entrypoint": null,
+  "mounts": [
+    {
+      "name": "nifti-in",
+      "writable": false,
+      "path": "/input"
+    },
+    {
+      "name": "extracted-nifti-out",
+      "writable": true,
+      "path": "/output"
+    }
+  ],
+  "environment-variables": {
+    "envName1": "envVal1",
+    "envName2": "#inputReplacementKey#"
+  },
+  "ports": {
+    "22": "52222",
+    "80": "8080"
+  },
+  "inputs": [
+    {
+      "name": "options",
+      "description": "Command-line flags to pass to bet",
+      "type": "string",
+      "matcher": null,
+      "default-value": null,
+      "required": false,
+      "replacement-key": "[OPTIONS]",
+      "command-line-flag": null,
+      "command-line-separator": null,
+      "true-value": null,
+      "false-value": null
+    },
+    {
+      "name": "commandline-filename",
+      "description": null,
+      "type": "string",
+      "matcher": null,
+      "default-value": null,
+      "required": true,
+      "replacement-key": "[FILENAME]",
+      "command-line-flag": null,
+      "command-line-separator": null,
+      "true-value": null,
+      "false-value": null
+    }
+  ],
+  "outputs": [
+    {
+      "name": "extracted-nifti",
+      "description": "The nifti file with brain extracted from skull and CSF",
+      "required": true,
+      "mount": "extracted-nifti-out",
+      "path": "./",
+      "glob": ""
+    }
+  ],
+  "xnat": [
+    {
+      "name": "bet-nifti",
+      "description": "Run FSL’s brain extraction on a nifti file.",
+      "contexts": [
+        "xnat:imageScanData"
+      ],
+      "external-inputs": [
+        {
+          "name": "scan",
+          "description": "scan",
+          "type": "Scan",
+          "matcher": "'NIFTI' in @.resources[*].label",
+          "default-value": null,
+          "required": true,
+          "replacement-key": null,
+          "provides-value-for-command-input": "",
+          "provides-files-for-command-mount": "",
+          "via-setup-command": null,
+          "user-settable": true,
+          "load-children": true
+        }
+      ],
+      "derived-inputs": [
+        {
+          "name": "scan-nifti",
+          "description": "The nifti resource on the scan",
+          "type": "Resource",
+          "matcher": "@.label == 'NIFTI'",
+          "default-value": null,
+          "required": true,
+          "replacement-key": null,
+          "provides-value-for-command-input": "",
+          "provides-files-for-command-mount": "nifti-in",
+          "user-settable": null,
+          "load-children": true,
+          "derived-from-wrapper-input": "scan",
+          "derived-from-xnat-object-property": null,
+          "via-setup-command": null
+        },
+        {
+          "name": "file-nifti",
+          "description": "The nifti file in the resource",
+          "type": "File",
+          "matcher": "",
+          "default-value": null,
+          "required": true,
+          "replacement-key": null,
+          "provides-value-for-command-input": "",
+          "provides-files-for-command-mount": "",
+          "user-settable": null,
+          "load-children": true,
+          "derived-from-wrapper-input": "scan-nifti",
+          "derived-from-xnat-object-property": null,
+          "via-setup-command": null
+        },
+        {
+          "name": "filename",
+          "description": "The name of the nifti file on the resource",
+          "type": "string",
+          "matcher": "",
+          "default-value": null,
+          "required": true,
+          "replacement-key": null,
+          "provides-value-for-command-input": "commandline-filename",
+          "provides-files-for-command-mount": "",
+          "user-settable": null,
+          "load-children": false,
+          "derived-from-wrapper-input": "file-nifti",
+          "derived-from-xnat-object-property": "name",
+          "via-setup-command": null
+        }
+      ],
+      "output-handlers": [
+        {
+          "name": "nifti-output-handler",
+          "accepts-command-output": "extracted-nifti",
+          "via-wrapup-command": null,
+          "as-a-child-of-wrapper-input": "scan",
+          "type": "Resource",
+          "label": "EXTRACTED"
+        }
+      ]
+    }
+  ],
+  "reserve-memory": null,
+  "limit-memory": null,
+  "limit-cpu": null
+}

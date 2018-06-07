@@ -1,4 +1,4 @@
-[Home](./tutorial.md)
+[Home](./tutorial.md)   [Glossary](./tutorial.md#glossary)
 
 ## Part 2. Manipulating Data from XNAT: dcm2niix
 
@@ -315,6 +315,10 @@ The output handler accepts command output from the output named "nifti", and cre
 ### Executing the Command
 
 Phew!  That was a lot to go over.  Let's run it!  First we have to create a new command.  Navigate to **Administer -> Plugin Settings -> Images and Commands** and open the dcm2niix command back up to take note of the command ID.
+
+Make sure that the command is enabled in the Command Configurations tab.
+
+![Command Configurations](CommandConfigurations.png)
 
 Navigate back to the Swagger UI and use the route [we did before](./tutorial_part1.md#running-our-hello-world-command):
 
