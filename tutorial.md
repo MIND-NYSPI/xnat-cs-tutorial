@@ -22,7 +22,7 @@
   [Output Handling](./tutorial_part2.md#output-handling)  
   [One Common Error](./tutorial_part2.md#one-common-error)
 
-## Part 3. Accepting Arbitrary Inputs and Outputs: FSL Operations
+## [Part 3. Accepting Arbitrary Inputs and Outputs: FSL Operations](./tutorial_part3.md)
 
 ## Glossary
 

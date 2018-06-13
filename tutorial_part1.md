@@ -141,7 +141,7 @@ Another small complexity is that, at least in the current version of XNAT, 1.7.4
 
 ### Running Our Hello World Command
 
-We'll make a project.  Go to New -> Project.
+We'll make a project.  Go to **New -> Project**.
 
 Fill out the values for Project Title, Running Title, and Project ID as follows:
 
