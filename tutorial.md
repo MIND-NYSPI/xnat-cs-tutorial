@@ -54,6 +54,8 @@ Mount: a location in a file system where external storage can be accessed.
 
 Object: in programming generally, a data type that can have properties and methods associated with it.  In JSON, a series of key value pairs enclosed in curly braces.  Scan, Resource, and File are examples of first kind of object in XNAT.  The command is a JSON object.
 
+Regular Expression (regex): a set of symbols for representing patterns in text.  Regexes are tools for selecting texts that match the patern, and can be used in Matchers.
+
 Resource: in this context, a resource is an XNAT object that represents a category of files in a scan.  It is the level of organization between Scan and File.  A resource contains files, and can be provided to a mount in a container and act like a directory. 
 
 REST API: a set of conventions wherein a program can send requests to a application via a URI to either get information from the application's back end, or to provide data to the application.

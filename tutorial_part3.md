@@ -165,7 +165,7 @@ That looks like this:
           "name": "nifti-filename",
           "description": "The name of the nifti file on the resource",
           "type": "string",
-          "matcher": "",
+          "matcher": "@.name =~ /.*nii/",
           "default-value": null,
           "required": true,
           "replacement-key": null,
@@ -180,9 +180,7 @@ That looks like this:
       ],
 ```
 
-Up through the first derived input, our command looks very similar to dcm2niix.  We still take the scan from the program making the API request as an external input.  We're still deriving the resource and mounting it at the mount point (now named "nifti-in").  What's new is that we're deriving two further inputs.  First, from the resource, we derive the file.  
-
-You might wonder why there is no matcher for the file.  There ought to be.  It's hardly impossible for a resource to have more than one file; you might have a resource with both a NIFTI file and a text file with some metadata, for instance.  As of this writing, I have not been able to find a working matcher that doesn't assume we know the file name already -- and if we knew it, we could hard code it into the command line, which is what we hope to avoid.  Provisionally, I have been running this command with no matcher, but that's not a good long-term solution.  See [here](https://groups.google.com/forum/#!topic/xnat_discussion/uNh2CQU-LLY) for a discussion of this issue.
+Up through the first derived input, our command looks very similar to dcm2niix.  We still take the scan from the program making the API request as an external input.  We're still deriving the resource and mounting it at the mount point (now named "nifti-in").  What's new is that we're deriving two further inputs.  First, from the resource, we derive the file.  The matcher for the file might look a little unfamiliar.  `=~` is a JSONPath operator that means "matches regular expression."  Regular expressions are sets of symbols that, according to a standard convention, constitute a pattern that can either match or not match a text.  Learning to use regular expressions fluently is a major feat; they are a small language unto themselves.  The important thing to know here is that `/.*nii/` is the pattern "ends in 'nii'". When you go on to use the container service you may have other patterns that you need -- maybe you have more than one file in a resource with the same extension and you'll have to disambiguate them some other way. 
 
 Finally we derive the file name.  It is the first derived input we've seen with two properties set `provides-value-for-command-input` and `derived-from-xnat-object-property`.  It provides values for the command input we created in the first section, "infilename", and it is derived from the XNAT property of the file object, name.  This input gives us our file name, which we then pass back to the command input to place on the command line.
 
@@ -319,7 +317,7 @@ Here's a whole command that can run bet:
           "name": "nifti-file",
           "description": "The nifti file in the resource",
           "type": "File",
-          "matcher": "",
+          "matcher": "@.name =~ /.*nii/",
           "default-value": null,
           "required": true,
           "replacement-key": null,
@@ -382,3 +380,9 @@ If your command worked, you when you navigate to **PROJECT: CS_TUTORIAL  >  SUBJ
 ![Extracted Nifti File](Extracted.png)
 
 You can also try navigating in your browser to the Experiment, Scan, Resource, and File pages in the API [the way we did](./tutorial_part2.md#xnats-data-organization) in Part 2 and looking for your new file there.
+
+### Multiple Inputs and Outputs
+
+The next step in generalizing our approach is to write commands that can take multiple inputs and generate multiple outputs, which we'll do with FSL's linear registration procedure, FLIRT.
+
+To run FLIRT, we need two NIFTI files.  We can use the sample
