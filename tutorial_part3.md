@@ -8,6 +8,8 @@
 [Generating a Path to the Input](#generating-a-path-to-the-input)  
 [Multiple Derived Inputs and Properties as Derived Inputs](#multiple-derived-inputs-and-properties-as-derived-inputs)  
 [Putting the Command Together](#putting-the-command-together)  
+[Multiple Inputs and Outputs](#multiple-inputs-and-outputs)
+[Getting Our Sample Data Into XNAT](#getting-our-sample-data-into-xnat)
 
 
 ### A Process That Takes a File as Input
@@ -383,6 +385,59 @@ You can also try navigating in your browser to the Experiment, Scan, Resource, a
 
 ### Multiple Inputs and Outputs
 
-The next step in generalizing our approach is to write commands that can take multiple inputs and generate multiple outputs, which we'll do with FSL's linear registration procedure, FLIRT.
+The next step in generalizing our approach is to write commands that can take multiple inputs and generate multiple outputs, which we'll do with FSL's linear registration procedure, FLIRT.  FLIRT takes a source and a reference image, and also 
 
-To run FLIRT, we need two NIFTI files.  We can use the sample
+### Getting Our Sample Data Into XNAT
+
+To run FLIRT, we need two NIFTI files.  We can use the sample data available [here](http://www.fmrib.ox.ac.uk/primers/intro_primer/ExBox11/IntroBox11.html).  Click Data Download.  You will need to uncompress your data files.  There are multiple means of doing this; on a Mac double click should just work. First uncompress the main ExBox11 directory, and then the structural.nii.gz file and the fmri.nii.gz file.  
+
+We need to get this data into XNAT.  Navigate to the CS_Tutorial project page and click **Add->Subject**.
+I named my new subject '001', since I'm not very concerned with naming consistency with dcmtest1. 
+
+![Add a subject](AddSubject.png) 
+
+![Subject information](SubjectDetails.png)
+
+Next we need to add a new experiment.  From the project page, click on Subject 001, then click Add Experiment.  
+
+![Add an experiment](AddExperiment.png)
+
+The type of experiment is MR Session.  
+
+![Experiment type](AddNewMRSession.png)
+
+Finally, enter the experiment information.  I named my experiment MR_Session. We have two scans in this session, our structural T1 and our functional images.  
+
+![Experiment details](MR_Session.png)
+
+Now we have to actually upload the imaging files to XNAT.  From the Subject page, click on the experiment, which we just named MR_Session.  Then navigate to Manage Files.
+
+![Manage files](ManageFiles.png)
+
+Before we upload our files we need to make the resource folder for them. Click Add Folder.
+
+![Add folder](AddFolder.png)
+
+ Select Scans for Level, select 1 for Item, and name the folder NIFTI.  
+ 
+ ![Create folder](CreateFolder.png)
+ 
+ Then create the same folder, also named 'NIFTI', for Scan 2. 
+
+ Now click Upload Files.  
+
+ ![Upload files](UploadFiles.png)
+
+For the first file, level is scans, item is 1 and folder is NIFTI. Click Choose File and select the structural.nii file you uncompressed earlier.  Finally click Upload.
+
+![Choose file](ChooseFile.png)
+
+Now do the same thing again, this time selecting item 2 and fmri.nii.
+
+
+Now that we've uploaded our files, we 
+
+
+
+
+
