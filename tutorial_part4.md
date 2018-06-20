@@ -10,10 +10,11 @@
 [Checks for Understanding: Mounts, Wrapper Inputs and Output Handlers for FLIRT](#checks-for-understanding-mounts-wrapper-inputs-and-output-handlers-for-flirt)  
 [Putting FLIRT together](#putting-flirt-together)    
 [Executing the Command](#executing-the-command)  
+[Goodbye for Now](#goodbye-for-now)
 
 ### Multiple Inputs and Outputs
 
-The next step in generalizing our approach is to write commands that can take multiple inputs and generate multiple outputs, which we'll do with FSL's linear registration procedure, FLIRT.  FLIRT takes a source and a reference image, and also 
+The next step in generalizing our approach is to write commands that can take multiple inputs and generate multiple outputs, which we'll do with FSL's linear registration procedure, FLIRT.  FLIRT takes a source and a reference image as inputs, and also produces more than one output: a transformed source image and a transformation matrix.
 
 ### Getting Our Sample Data Into XNAT
 
@@ -26,37 +27,37 @@ I named my new subject '001', since I'm not very concerned with naming consisten
 
 ![Subject information](SubjectDetails.png)
 
-Next we need to add a new experiment.  From the project page, click on Subject 001, then click Add Experiment.  
+Next we need to add a new experiment.  From the project page, click on Subject **001**, then click **Add Experiment**.  
 
 ![Add an experiment](AddExperiment.png)
 
 The type of experiment is MR Session.  
 
-![Experiment type](AddNewMRSession.png)
+![Experiment details](MR_Session.png)
 
 Finally, enter the experiment information.  I named my experiment MR_Session. We have two scans in this session, our structural T1 and our functional images.  
 
-![Experiment details](MR_Session.png)
+![Experiment type](AddNewMRSession.png)
 
 Now we have to actually upload the imaging files to XNAT.  From the Subject page, click on the experiment, which we just named MR_Session.  Then navigate to Manage Files.
 
 ![Manage files](ManageFiles.png)
 
-Before we upload our files we need to make the resource folder for them. Click Add Folder.
+Before we upload our files we need to make the resource folder for them. Click **Add Folder**.
 
 ![Add folder](AddFolder.png)
 
- Select Scans for Level, select 1 for Item, and name the folder NIFTI.  
+ Select Scans for Level, select 1 for Item, and name the folder NIFTI.  Click **Create**.
  
  ![Create folder](CreateFolder.png)
  
  Then create the same folder, also named 'NIFTI', for Scan 2. 
 
- Now click Upload Files.  
+ Now click **Upload Files**.  
 
  ![Upload files](UploadFiles.png)
 
-For the first file, level is scans, item is 1 and folder is NIFTI. Click Choose File and select the structural.nii file you uncompressed earlier.  Finally click Upload.
+For the first file, level is scans, item is 1 and folder is NIFTI. Click **Choose File** and select the structural.nii file you uncompressed earlier.  Finally click **Upload**.
 
 ![Choose file](ChooseFile.png)
 
@@ -64,7 +65,7 @@ Now do the same thing again, this time selecting item 2 and fmri.nii.
 
 ### The FLIRT Command Line
 
-Now that we've uploaded our files, we can write our command to register two images using FLIRT.  From the FLIRT documentation:
+Now that we've uploaded our files, we can write our command to register two images using FLIRT.  From the [FLIRT documentation](ftp://surfer.nmr.mgh.harvard.edu/pub/dist/freesurfer/tutorial_packages/OSX/fsl_501/doc/wiki/FLIRT(2f)UserGuide.html#FLIRT_Examples):
 
 >The simplest usage of flirt is to register two images together as:  
 >
@@ -151,7 +152,7 @@ We next need to specify our command line inputs:
     }
   ``` 
 
-We've made a couple of different choices here than in the bet command.  Before, we allowed the command line input that provided the name of our output to be null, i.e., we set "required" to "false", and we provided a default value so that the program in the application-program interface (i.e., us, at the Swagger UI) didn't have to provide it.  Either choice is valid; it's up to the person writing the command to decide.
+We've made a couple of different choices here than in the bet command.  Before, we allowed the command line input that provided the name of our output to be null, i.e., we set "required" to "false", and we provided a default value so that the program in the application-program interface (us, at the Swagger UI) didn't have to provide it.  Either choice is valid; it's up to the person writing the command to decide.
 
 Another thing you might notice is that the input "dof" has a "command-line-flag".  In command line text, a flag is a character or set of characters preceded by a hyphen that tells a computer program how to interpret what comes next. In FLIRT, the flag "-dof" precedes the number of degrees of freedom. This means when we provide the input at the Swagger UI we don't have to say "-dof 12", but instead can provide simply, "12" (or however many degrees of freedom we choose).  It also would have been valid to to leave `command-line-flag` as null, and have the input format be "-dof 12".
 
@@ -185,301 +186,13 @@ There's something made explicit here that we left implicit when specifying outpu
 
 Speaking of mounts, we have four directories in our command line, in, ref, out, and outmat.  We need mount points for all of them.  As a check for understanding, try to write out how they should be defined in the command.
 
-The external and derived inputs work just the same as they did for bet; now they are two of each type.  Now try to write out their command definition.
+The external and derived inputs work just the same as they did for bet; now there are two of each type.  Now try to write out their command definition.
 
 And finally try to write out the output handlers for our two outputs.  One subtlety here is the `as-a-child-of-wrapper-input-key`.  It will ultimately be up to you and your data needs to decide where your output go; in this case, it makes sense to store our output with our input volume (the volume that is having the transformation applied to it).
 
 ### Putting FLIRT Together ###
 
-If you're all done checking your understanding, [here's the full command](./flirt.json) for running FLIRT:
-
-```
-{
-  "name": "flirt-command",
-  "label": "flirt",
-  "description": "FSL Flirt Registration",
-  "version": "1.0",
-  "schema-version": "1.0",
-  "info-url": "https://fsl.fmrib.ox.ac.uk/fsl/fslwiki/FLIRT/UserGuide",
-  "image": "brainlife/fsl:latest",
-  "type": "docker",
-  "index": "https://index.docker.io/v1/",
-  "working-directory": null,
-  "command-line": "flirt -in /in/[INVOL] -ref /ref/[REFVOL] -out /out/[OUTVOL] -omat /outmat/[OUTMAT] [DOF]",
-  "override-entrypoint": null,
-  "mounts": [
-    {
-      "name": "in",
-      "writable": false,
-      "path": "/in"
-    },
-    {
-      "name": "out",
-      "writable": true,
-      "path": "/out"
-    },
-    {
-      "name": "outmat",
-      "writable": true,
-      "path": "/outmat"
-    },
-    {
-      "name": "ref",
-      "writable": false,
-      "path": "/ref"
-    }
-  ],
-  "environment-variables": {
-    "envName1": "envVal1",
-    "envName2": "#inputReplacementKey#"
-  },
-  "ports": {
-    "22": "52222",
-    "80": "8080"
-  },
-  "inputs": [
-    {
-      "name": "in_fname",
-      "description": null,
-      "type": "string",
-      "matcher": null,
-      "default-value": null,
-      "required": true,
-      "replacement-key": "[INVOL]",
-      "command-line-flag": null,
-      "command-line-separator": null,
-      "true-value": null,
-      "false-value": null
-    },
-    {
-      "name": "ref_fname",
-      "description": null,
-      "type": "string",
-      "matcher": null,
-      "default-value": null,
-      "required": true,
-      "replacement-key": "[REFVOL]",
-      "command-line-flag": null,
-      "command-line-separator": null,
-      "true-value": null,
-      "false-value": null
-    },
-    {
-      "name": "out_fname",
-      "description": null,
-      "type": "string",
-      "matcher": null,
-      "default-value": null,
-      "required": true,
-      "replacement-key": "[OUTVOL]",
-      "command-line-flag": null,
-      "command-line-separator": null,
-      "true-value": null,
-      "false-value": null
-    },
-    {
-      "name": "mat_fname",
-      "description": null,
-      "type": "string",
-      "matcher": null,
-      "default-value": null,
-      "required": true,
-      "replacement-key": "[OUTMAT]",
-      "command-line-flag": null,
-      "command-line-separator": null,
-      "true-value": null,
-      "false-value": null
-    },
-    {
-      "name": "dof",
-      "description": "degrees of freedom",
-      "type": "string",
-      "matcher": null,
-      "default-value": null,
-      "required": false,
-      "replacement-key": "[DOF]",
-      "command-line-flag": "-dof",
-      "command-line-separator": null,
-      "true-value": null,
-      "false-value": null
-    }
-  ],
-  "outputs": [
-    {
-      "name": "outvol",
-      "description": "output volume",
-      "required": true,
-      "mount": "out",
-      "path": "./",
-      "glob": ""
-    },
-    {
-      "name": "outmat",
-      "description": "transform matrix",
-      "required": true,
-      "mount": "outmat",
-      "path": "./",
-      "glob": ""
-    }
-  ],
-  "xnat": [
-    {
-      "name": "flirt-wrapper",
-      "description": "Run FSL’s FLIRT registration",
-      "contexts": [],
-      "external-inputs": [
-        {
-          "name": "invol_scan",
-          "description": "scan of the input volume",
-          "type": "Scan",
-          "matcher": "'NIFTI' in @.resources[*].label",
-          "default-value": null,
-          "required": true,
-          "replacement-key": null,
-          "provides-value-for-command-input": "",
-          "provides-files-for-command-mount": "",
-          "via-setup-command": null,
-          "user-settable": true,
-          "load-children": true
-        },
-        {
-          "name": "refvol_scan",
-          "description": "scan of the reference volume",
-          "type": "Scan",
-          "matcher": "'NIFTI' in @.resources[*].label",
-          "default-value": null,
-          "required": true,
-          "replacement-key": null,
-          "provides-value-for-command-input": "",
-          "provides-files-for-command-mount": "",
-          "via-setup-command": null,
-          "user-settable": true,
-          "load-children": true
-        }
-      ],
-      "derived-inputs": [
-        {
-          "name": "invol_resource",
-          "description": "The nifti resource on the scan of the input volume",
-          "type": "Resource",
-          "matcher": "@.label == 'NIFTI'",
-          "default-value": null,
-          "required": true,
-          "replacement-key": null,
-          "provides-value-for-command-input": "",
-          "provides-files-for-command-mount": "in",
-          "user-settable": null,
-          "load-children": true,
-          "derived-from-wrapper-input": "invol_scan",
-          "derived-from-xnat-object-property": null,
-          "via-setup-command": null
-        },
-        {
-          "name": "refvol_resource",
-          "description": "The nifti resource on the scan of the reference volume",
-          "type": "Resource",
-          "matcher": "@.label == 'NIFTI'",
-          "default-value": null,
-          "required": true,
-          "replacement-key": null,
-          "provides-value-for-command-input": "",
-          "provides-files-for-command-mount": "ref",
-          "user-settable": null,
-          "load-children": true,
-          "derived-from-wrapper-input": "refvol_scan",
-          "derived-from-xnat-object-property": null,
-          "via-setup-command": null
-        },
-        {
-          "name": "invol_file",
-          "description": "The nifti file of the input volume",
-          "type": "File",
-          "matcher": "@.name =~ /.*nii/",
-          "default-value": null,
-          "required": true,
-          "replacement-key": null,
-          "provides-value-for-command-input": "",
-          "provides-files-for-command-mount": "",
-          "user-settable": null,
-          "load-children": true,
-          "derived-from-wrapper-input": "invol_resource",
-          "derived-from-xnat-object-property": null,
-          "via-setup-command": null
-        },
-        {
-          "name": "refvol_file",
-          "description": "The nifti file of the reference volume",
-          "type": "File",
-          "matcher": "@.name =~ /.*nii/",
-          "default-value": null,
-          "required": true,
-          "replacement-key": null,
-          "provides-value-for-command-input": "",
-          "provides-files-for-command-mount": "",
-          "user-settable": null,
-          "load-children": true,
-          "derived-from-wrapper-input": "refvol_resource",
-          "derived-from-xnat-object-property": null,
-          "via-setup-command": null
-        },
-        {
-          "name": "invol_fname",
-          "description": "The name of the nifti file on the resource of the input volume",
-          "type": "string",
-          "matcher": "",
-          "default-value": null,
-          "required": true,
-          "replacement-key": null,
-          "provides-value-for-command-input": "in_fname",
-          "provides-files-for-command-mount": "",
-          "user-settable": null,
-          "load-children": false,
-          "derived-from-wrapper-input": "invol_file",
-          "derived-from-xnat-object-property": "name",
-          "via-setup-command": null
-        },
-        {
-          "name": "refvol_fname",
-          "description": "The name of the nifti file on the resource of the reference volume",
-          "type": "string",
-          "matcher": "",
-          "default-value": null,
-          "required": true,
-          "replacement-key": null,
-          "provides-value-for-command-input": "ref_fname",
-          "provides-files-for-command-mount": "",
-          "user-settable": null,
-          "load-children": false,
-          "derived-from-wrapper-input": "refvol_file",
-          "derived-from-xnat-object-property": "name",
-          "via-setup-command": null
-        }
-      ],
-      "output-handlers": [
-        {
-          "name": "outvol_handler",
-          "accepts-command-output": "outvol",
-          "via-wrapup-command": null,
-          "as-a-child-of-wrapper-input": "invol_scan",
-          "type": "Resource",
-          "label": "REGISTERED_VOL"
-        },
-        {
-          "name": "outmat_handler",
-          "accepts-command-output": "outmat",
-          "via-wrapup-command": null,
-          "as-a-child-of-wrapper-input": "invol_scan",
-          "type": "Resource",
-          "label": "XFORM_MATRIX"
-        }
-      ]
-    }
-  ],
-  "reserve-memory": null,
-  "limit-memory": null,
-  "limit-cpu": null
-}
-```
+If you're all done checking your understanding, [here's the full command](./flirt.json) for running FLIRT.  Copy it into a new command on the Images and Commands tab.
 
 One more check for understanding: try to write out what the parameters we will pass at the Swagger UI will be.  Hint: the JSON object we give the Swagger UI in the allRequestParams box will have five entries in it.  
 
@@ -501,9 +214,17 @@ If we use this path `POST /xapi/commands/{commandId}/wrappers/{wrapperName}/laun
 
 You may well have chosen different values for "out_fname" and "mat_fname".
 
-Click Try It Out!. Did you get a success response? If so, [investigate the command history](./tutorial_part1.md/#investigating-the-command-history) to see if you [find any errors](./tutorial_part1.md#error-logging).  
+Click **Try It Out!**. Did you get a success response? If so, [investigate the command history](./tutorial_part1.md/#investigating-the-command-history) to see if you [find any errors](./tutorial_part1.md#error-logging).  
 
-If all went well, you should 
+If all went well, you should be able to see your new files in the File Manager.
+
+![FLIRT files](FLIRTfiles.png)  
+
+### Goodbye For Now
+
+That's it for this tutorial.  Later iterations may contain discussions of how to make your XNAT server communicate with remote container servers, so you can do your computing on any machine.
+
+
 
 
 

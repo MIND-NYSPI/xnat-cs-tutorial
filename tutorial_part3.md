@@ -1,6 +1,6 @@
 [Home](./tutorial.md)   [Glossary](./tutorial.md#glossary)
 
-## Part 3a. Accepting Arbitrary Inputs and Outputs: FSL's Brain Extraction 
+## Part 3. Accepting Arbitrary Inputs and Outputs: FSL's Brain Extraction 
 
 ### Table of Contents
 
@@ -12,7 +12,7 @@
 
 ### A Process That Takes a File as Input
 
-The next step in writing commands is learning to take more kinds of input and generate more kinds of output.  To this end, we're first going to run bet, the [FSL brain extraction](https://fsl.fmrib.ox.ac.uk/fsl/fslwiki/BET/UserGuide) routine on our newly generated NIFTI file.  One of the things that makes dcm2niix a little more straightforward than bet is that with dcm2niix our input is a directory, and we don't have to think about how we would refer to files within that directory.  We have a single derived input, the resource, we mount that directly, and Bob's your uncle.  The only thing dcm2niix needs for output is also a directory.
+The next step in writing commands is learning to take more kinds of input and generate more kinds of output.  To this end, we're first going to run bet, the [FSL brain extraction](https://fsl.fmrib.ox.ac.uk/fsl/fslwiki/BET/UserGuide) routine, on our newly generated NIFTI file.  One of the things that makes dcm2niix a little more straightforward than bet is that with dcm2niix our input is a directory, and we don't have to think about how we would refer to files within that directory.  We have a single derived input, the resource, we mount that directly, and Bob's your uncle.  The only thing dcm2niix needs for output is also a directory.
 
 For bet, on the other hand, the basic syntax is
 
@@ -26,7 +26,7 @@ The first step is to pull a new image with FSL installed.  Just like you did in 
 
 Using what we know from executing our dcm2niix command, we'll build up to generating a path to the input file within the container.  Just as before, we to need to mount the resource directory in the container.  What's new is that we need to know the path to the individual file, and that means knowing the file name.  
 
-One option would be to look it up and manually enter it in our command line.  In Part 2 we learned to use the API to inspect data.  You coud navigate to `<your-xnat-url>/data/experiments/<your-experiment-id>/scans/2/resources/NIFTI/files` and the property name associated with your file would be, naturally enough the file name.   
+One option would be to look it up and manually enter it in our command line.  In Part 2 [we learned](./tutorial_part2.md#xnats-data-organization) to use the API to inspect data.  You coud navigate to `<your-xnat-url>/data/experiments/<your-experiment-id>/scans/2/resources/NIFTI/files` and the property name associated with your file would be, naturally enough, the file name.   
 
 Let's look it up.
 
@@ -79,7 +79,7 @@ Then our inputs would be
   ]
 ```
 
-If we were planning on letting the output file name be set at run name by the program making the API query, we could also include in the input
+If we were planning on letting the output file name be set at run name by the program making the API query, we could also include the input
 
 ```
  {
@@ -180,9 +180,9 @@ That looks like this:
       ],
 ```
 
-Up through the first derived input, our command looks very similar to dcm2niix.  We still take the scan from the program making the API request as an external input.  We're still deriving the resource and mounting it at the mount point (now named "nifti-in").  What's new is that we're deriving two further inputs.  First, from the resource, we derive the file.  The matcher for the file might look a little unfamiliar.  `=~` is a JSONPath operator that means "matches regular expression."  Regular expressions are sets of symbols that, according to a standard convention, constitute a pattern that can either match or not match a text.  Learning to use regular expressions fluently is a major feat; they are a small language unto themselves.  The important thing to know here is that `/.*nii/` is the pattern "ends in 'nii'". When you go on to use the container service you may have other patterns that you need -- maybe you have more than one file in a resource with the same extension and you'll have to disambiguate them some other way. 
+Up through the first derived input, our command looks very similar to dcm2niix.  We still take the scan from the program making the API request as an external input.  We're still deriving the resource and mounting it at the mount point (now named "nifti-in").  What's new is that we're deriving two further inputs.  First, from the resource, we derive the file.  The matcher for the file might look a little unfamiliar.  `=~` is a JSONPath operator that means "matches regular expression."  Regular expressions are sets of symbols that, according to a standard convention, constitute a pattern that can either match or not match a text.  Learning to use regular expressions fluently is a major feat; they are a small language unto themselves.  The important thing to know here is that `/.*nii/` is the pattern "ends in 'nii'". When you go on to use the container service you may have other patterns that you need -- maybe you have more than one file in a resource with the same extension -- and you'll have to disambiguate them some other way. 
 
-Finally we derive the file name.  It is the first derived input we've seen with two properties set `provides-value-for-command-input` and `derived-from-xnat-object-property`.  It provides values for the command input we created in the first section, "infilename", and it is derived from the XNAT property of the file object, name.  This input gives us our file name, which we then pass back to the command input to place on the command line.
+Finally we derive the file name.  It is the first derived input we've seen with two properties set: `provides-value-for-command-input` and `derived-from-xnat-object-property`.  It provides values for the command input we created in the first section, "infilename", and it is derived from the XNAT property of the file object, name.  This input gives us our file name, which we then pass back to the command input to place on the command line.
 
 ### Putting The Command Together
 
@@ -375,7 +375,7 @@ Click **Try It Out**!
 
 You can [investigate the Command History](./tutorial_part1.md#investigating-the-command-history) to look for any output or error logs.  
 
-If your command worked, you when you navigate to **PROJECT: CS_TUTORIAL  >  SUBJECT: dcmtest1  >  dcmtest1_MR1** and click **Manage Files** you should see a new subdirectory, extracted, that has your new NIFTI file.
+If your command worked, you when you navigate to **PROJECT: CS_TUTORIAL  >  SUBJECT: dcmtest1  >  dcmtest1_MR1** and click **Manage Files** you should see a new subdirectory, EXTRACTED, that has your new NIFTI file.
 
 ![Extracted Nifti File](Extracted.png)
 

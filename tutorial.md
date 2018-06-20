@@ -34,7 +34,8 @@
 [The FLIRT Command Line](./tutorial_part4.md#the-flirt-command-line)  
 [Checks for Understanding: Mounts, Wrapper Inputs and Output Handlers for FLIRT](./tutorial_part4md#checks-for-understanding-mounts-wrapper-inputs-and-output-handlers-for-flirt)  
 [Putting FLIRT together](./tutorial_part4.md#putting-flirt-together)    
-[Executing the Command](./tutorial_part4.md#executing-the-command) 
+[Executing the Command](./tutorial_part4.md#executing-the-command)  
+[Goodbye for Now](./tutorial_part4.md#goodbye-for-now)  
 
 ## Glossary
 
