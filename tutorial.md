@@ -22,9 +22,19 @@
   [Output Handling](./tutorial_part2.md#output-handling)  
   [One Common Error](./tutorial_part2.md#one-common-error)
 
-## [Part 3a. Accepting Arbitrary Inputs and Outputs: FSL's Brain Extraction](./tutorial_part3a.md)
+## [Part 3. Accepting Arbitrary Inputs and Outputs: FSL's Brain Extraction](./tutorial_part3.md)
+[A Process That Takes a File as Input](./tutorial_part3.md#a-process-that-takes-a-file-as-input)  
+[Generating a Path to the Input](./tutorial_part3.md#generating-a-path-to-the-input)  
+[Multiple Derived Inputs and Properties as Derived Inputs](./tutorial_part3.md#multiple-derived-inputs-and-properties-as-derived-inputs)  
+[Putting the Command Together](./tutorial_part3.md#putting-the-command-together)  
 
-## [Part 3b. Accepting Arbitrary Inputs and Outputs: FSL's FLIRT](./tutorial_part3b.md)
+## [Part 4. Accepting Arbitrary Inputs and Outputs: FSL's FLIRT](./tutorial_part4.md)
+[Multiple Inputs and Outputs](./tutorial_part4.md#multiple-inputs-and-outputs)  
+[Getting Our Sample Data Into XNAT](./tutorial_part4.md#getting-our-sample-data-into-xnat)  
+[The FLIRT Command Line](./tutorial_part4.md#the-flirt-command-line)  
+[Checks for Understanding: Mounts, Wrapper Inputs and Output Handlers for FLIRT](./tutorial_part4md#checks-for-understanding-mounts-wrapper-inputs-and-output-handlers-for-flirt)  
+[Putting FLIRT together](./tutorial_part4.md#putting-flirt-together)    
+[Executing the Command](./tutorial_part4.md#executing-the-command) 
 
 ## Glossary
 
