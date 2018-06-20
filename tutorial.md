@@ -22,7 +22,9 @@
   [Output Handling](./tutorial_part2.md#output-handling)  
   [One Common Error](./tutorial_part2.md#one-common-error)
 
-## [Part 3. Accepting Arbitrary Inputs and Outputs: FSL Operations](./tutorial_part3.md)
+## [Part 3a. Accepting Arbitrary Inputs and Outputs: FSL's Brain Extraction](./tutorial_part3a.md)
+
+## [Part 3b. Accepting Arbitrary Inputs and Outputs: FSL's FLIRT](./tutorial_part3b.md)
 
 ## Glossary
 
@@ -43,6 +45,8 @@ Docker Image: an image is a snapshot of a machine that has the capacity to run p
 Experiment: in the XNAT context, experiment is what we might elsewhere call a session -- an object representing the discrete period of time the participant was in the lab and completed one or more scans. It is the level of organization between Project and Scan
 
 External Input: one of the two kinds of wrapper inputs. It is a path to an XNAT object, passed to the REST API in a POST request.  
+
+Flag: in command line text, a character or set of characters preceded by a hyphen that tells a computer program how to interpret what comes next.  For example, in FSL's linear registration program, FLIRT, the flag "-dof" precedes the number of degrees of freedom.  That tells FLIRT that the number after the flag should be interpreted as degrees of freedom.
 
 Input Replacement Key: a string in the command-line value of the command that will be matched with, and replaced by, a string from a command input provided when the container is launched.
 

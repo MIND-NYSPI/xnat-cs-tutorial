@@ -1,0 +1,284 @@
+{
+  "name": "flirt",
+  "label": "flirt",
+  "description": "FSL Flirt Registration",
+  "version": "1.0",
+  "schema-version": "1.0",
+  "info-url": "https://fsl.fmrib.ox.ac.uk/fsl/fslwiki/FLIRT/UserGuide",
+  "image": "brainlife/fsl:latest",
+  "type": "docker",
+  "index": "https://index.docker.io/v1/",
+  "working-directory": null,
+  "command-line": "flirt -in /in/[INVOL] -ref /ref/[REFVOL] -out /out/[OUTVOL] -omat /outmat/[OUTMAT] [DOF] [OPTIONS]",
+  "mounts": [
+    {
+      "name": "in",
+      "writable": false,
+      "path": "/in"
+    },
+    {
+      "name": "out",
+      "writable": true,
+      "path": "/out"
+    },
+    {
+      "name": "outmat",
+      "writable": true,
+      "path": "/outmat"
+    },
+    {
+      "name": "ref",
+      "writable": false,
+      "path": "/ref"
+    }
+  ],
+  "environment-variables": {
+    "envName1": "envVal1",
+    "envName2": "#inputReplacementKey#"
+  },
+  "ports": {
+    "22": "52222",
+    "80": "8080"
+  },
+  "inputs": [
+    {
+      "name": "options",
+      "description": "Command-line flags to pass to FLIRT",
+      "type": "string",
+      "matcher": null,
+      "default-value": null,
+      "required": false,
+      "replacement-key": "[OPTIONS]",
+      "command-line-flag": null,
+      "command-line-separator": null,
+      "true-value": null,
+      "false-value": null
+    },
+    {
+      "name": "in_fname",
+      "description": null,
+      "type": "string",
+      "matcher": null,
+      "default-value": null,
+      "required": true,
+      "replacement-key": "[INVOL]",
+      "command-line-flag": null,
+      "command-line-separator": null,
+      "true-value": null,
+      "false-value": null
+    },
+    {
+      "name": "ref_fname",
+      "description": null,
+      "type": "string",
+      "matcher": null,
+      "default-value": null,
+      "required": true,
+      "replacement-key": "[REFVOL]",
+      "command-line-flag": null,
+      "command-line-separator": null,
+      "true-value": null,
+      "false-value": null
+    },
+    {
+      "name": "out_fname",
+      "description": null,
+      "type": "string",
+      "matcher": null,
+      "default-value": null,
+      "required": true,
+      "replacement-key": "[OUTVOL]",
+      "command-line-flag": null,
+      "command-line-separator": null,
+      "true-value": null,
+      "false-value": null
+    },
+    {
+      "name": "mat_fname",
+      "description": null,
+      "type": "string",
+      "matcher": null,
+      "default-value": null,
+      "required": true,
+      "replacement-key": "[OUTMAT]",
+      "command-line-flag": null,
+      "command-line-separator": null,
+      "true-value": null,
+      "false-value": null
+    },
+    {
+      "name": "dof",
+      "description": "degrees of freedom",
+      "type": "string",
+      "matcher": null,
+      "default-value": null,
+      "required": false,
+      "replacement-key": "[DOF]",
+      "command-line-flag": "-dof",
+      "command-line-separator": null,
+      "true-value": null,
+      "false-value": null
+    }
+  ],
+  "outputs": [
+    {
+      "name": "outvol",
+      "description": "output volume",
+      "required": true,
+      "mount": "out",
+      "path": "./",
+      "glob": ""
+    },
+    {
+      "name": "outmat",
+      "description": "transform matrix",
+      "required": true,
+      "mount": "outmat",
+      "path": "./",
+      "glob": ""
+    }
+  ],
+  "xnat": [
+    {
+      "name": "flirt-wrapper",
+      "description": "Run FSL’s FLIRT registration",
+      "contexts": [],
+      "external-inputs": [
+        {
+          "name": "invol_scan",
+          "description": "scan of the input volume",
+          "type": "Scan",
+          "matcher": "'NIFTI' in @.resources[*].label",
+          "default-value": null,
+          "required": true,
+          "replacement-key": null,
+          "provides-value-for-command-input": "",
+          "provides-files-for-command-mount": "",
+          "user-settable": true,
+          "load-children": true
+        },
+        {
+          "name": "refvol_scan",
+          "description": "scan of the reference volume",
+          "type": "Scan",
+          "matcher": "'NIFTI' in @.resources[*].label",
+          "default-value": null,
+          "required": true,
+          "replacement-key": null,
+          "provides-value-for-command-input": "",
+          "provides-files-for-command-mount": "",
+          "user-settable": true,
+          "load-children": true
+        }
+      ],
+      "derived-inputs": [
+        {
+          "name": "invol_resource",
+          "description": "The nifti resource on the scan of the input volume",
+          "type": "Resource",
+          "matcher": "@.label == 'NIFTI'",
+          "default-value": null,
+          "required": true,
+          "replacement-key": null,
+          "provides-value-for-command-input": "",
+          "provides-files-for-command-mount": "in",
+          "user-settable": null,
+          "load-children": true,
+          "derived-from-wrapper-input": "invol_scan",
+          "derived-from-xnat-object-property": null
+        },
+        {
+          "name": "refvol_resource",
+          "description": "The nifti resource on the scan of the reference volume",
+          "type": "Resource",
+          "matcher": "@.label == 'NIFTI'",
+          "default-value": null,
+          "required": true,
+          "replacement-key": null,
+          "provides-value-for-command-input": "",
+          "provides-files-for-command-mount": "ref",
+          "user-settable": null,
+          "load-children": true,
+          "derived-from-wrapper-input": "refvol_scan",
+          "derived-from-xnat-object-property": null
+        },
+        {
+          "name": "invol_file",
+          "description": "The nifti file of the input volume",
+          "type": "File",
+          "matcher": "",
+          "default-value": null,
+          "required": true,
+          "replacement-key": null,
+          "provides-value-for-command-input": "",
+          "provides-files-for-command-mount": "",
+          "user-settable": null,
+          "load-children": true,
+          "derived-from-wrapper-input": "invol_resource",
+          "derived-from-xnat-object-property": null
+        },
+        {
+          "name": "refvol_file",
+          "description": "The nifti file of the reference volume",
+          "type": "File",
+          "matcher": "",
+          "default-value": null,
+          "required": true,
+          "replacement-key": null,
+          "provides-value-for-command-input": "",
+          "provides-files-for-command-mount": "",
+          "user-settable": null,
+          "load-children": true,
+          "derived-from-wrapper-input": "refvol_resource",
+          "derived-from-xnat-object-property": null
+        },
+        {
+          "name": "invol_fname",
+          "description": "The name of the nifti file on the resource of the input volume",
+          "type": "string",
+          "matcher": "",
+          "default-value": null,
+          "required": true,
+          "replacement-key": null,
+          "provides-value-for-command-input": "in_fname",
+          "provides-files-for-command-mount": "",
+          "user-settable": null,
+          "load-children": false,
+          "derived-from-wrapper-input": "invol_file",
+          "derived-from-xnat-object-property": "name"
+        },
+        {
+          "name": "refvol_fname",
+          "description": "The name of the nifti file on the resource of the reference volume",
+          "type": "string",
+          "matcher": "",
+          "default-value": null,
+          "required": true,
+          "replacement-key": null,
+          "provides-value-for-command-input": "ref_fname",
+          "provides-files-for-command-mount": "",
+          "user-settable": null,
+          "load-children": false,
+          "derived-from-wrapper-input": "refvol_file",
+          "derived-from-xnat-object-property": "name"
+        }
+      ],
+      "output-handlers": [
+        {
+          "name": "outvol_handler",
+          "accepts-command-output": "outvol",
+          "as-a-child-of-wrapper-input": "invol_scan",
+          "type": "Resource",
+          "label": "REGISTERED_VOL"
+        },
+        {
+          "name": "outmat_handler",
+          "accepts-command-output": "outmat",
+          "as-a-child-of-wrapper-input": "invol_scan",
+          "type": "Resource",
+          "label": "XFORM_MATRIX"
+        }
+      ]
+    }
+  ]
+}
