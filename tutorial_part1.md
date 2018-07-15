@@ -1,7 +1,7 @@
 
 [Home](./tutorial.md)   [Glossary](./tutorial.md#glossary)
 
-## Part 1. Installing the Container Service and Executing a Command: Hello, World. 
+## Part 1. Installing the Container Service and Executing a Command: Hello, World.
 
 ### Table of Contents
   [What This Tutorial Covers](#what-this-tutorial-covers)  
@@ -27,7 +27,7 @@ This tutorial assumes you have a working XNAT instance. You must have administra
 
 Download the .jar file of the “Latest Release” on this page to `<xnat-home>/plugins` and restart the tomcat server.
 
-In more detail: 
+In more detail:
 
 1. Nagivate to the plugins directory under your XNAT home directory.
 
@@ -55,7 +55,7 @@ In your XNAT home directory, you can download it with:
 
    `service tomcat7 restart`
 
-   Now, under Administer -> Plugin Settings in the XNAT menu you should see the Container Service pages. 
+   Now, under **Administer -> Plugin Settings** in the XNAT menu you should see the Container Service pages.
 
 ### Installing Images for the Container Service  
 
@@ -70,13 +70,13 @@ docker login
 ```
 and sign in with your credentials.  
 
-You can build your own Docker image, but you can also find many publically available images at [Docker Hub](https://hub.docker.com/).  Sign in with the same credentials you used to log in to Docker on your XNAT server.  This tutorial will first use the [xnat/dcm2niix image](https://hub.docker.com/r/xnat/dcm2niix/), and then later move to an image with FSL installed. To pull this the dcm2niix image to your machine, 
+You can build your own Docker image, but you can also find many publicly available images at [Docker Hub](https://hub.docker.com/).  Sign in with the same credentials you used to log in to Docker on your XNAT server.  This tutorial will first use the [xnat/dcm2niix image](https://hub.docker.com/r/xnat/dcm2niix/), and then later move to an image with FSL installed. To pull this the dcm2niix image to your machine,
 
 ```
 docker pull xnat/dcm2niix
 ```
 
-The image should begin downloading.  When it completes, if you navigate to **Administer -> Plugin Settings -> Images & Commands**, you should see listed `xnat/dcm2niix:latest`. 
+The image should begin downloading.  When it completes, if you navigate to **Administer -> Plugin Settings -> Images & Commands**, you should see listed `xnat/dcm2niix:latest`.
 
 ![Navigate to the Container Service](NavigateCS.png)
 
@@ -86,7 +86,7 @@ The image should begin downloading.  When it completes, if you navigate to **Adm
 
 XNAT requires information about what command-line instruction to send to the Docker container, what inputs that process expects, and how to process any outputs, if outputs are expected.  We give this information to XNAT in a JSON object called the command.  We'll start with the "Hello, World" of commands, adapted from the [official documentation](https://wiki.xnat.org/display/CS/Command). This command allows us to launch a container that will print "Hello world" (or anything else) to standard out.
 
-Navigate to **Administer -> Plugin Settings -> Images and Commands**.  Press the button `Add New Command` next to the listing for the xnat/dcm2niix image. 
+Navigate to **Administer -> Plugin Settings -> Images and Commands**.  Press the button `Add New Command` next to the listing for the xnat/dcm2niix image.
 
 ![Add New Command](AddNewCommand.png)
 
@@ -97,7 +97,7 @@ Navigate to **Administer -> Plugin Settings -> Images and Commands**.  Press the
     "name": "hello-world",
     "description": "Prints a string to stdout",
     "type": "docker",
-    "image": "brainlife/fsl:latest",
+    "image": "xnat/dcm2niix:latest",
     "command-line": "echo #my_cool_input#",
     "inputs": [
         {
@@ -131,11 +131,11 @@ If you are familiar with REST, you know that there are lots of ways to make REST
 
 ![an image of the Swagger web interface](Swagger.png)
 
-The Swagger interface also acts as a directory of the routes available to us. (Another source of documentation is available [here](https://wiki.xnat.org/display/CS/Container+Service+API).)  We are going to launch a container, so we scroll down to `launch-rest-api` and click on it to expand it.  We can see now why we need a wrapper.  All the routes require a wrapper name or a wrapper id. For example, 
+The Swagger interface also acts as a directory of the routes available to us. (Another source of documentation is available [here](https://wiki.xnat.org/display/CS/Container+Service+API).)  We are going to launch a container, so we scroll down to `launch-rest-api` and click on it to expand it.  We can see now why we need a wrapper.  All the routes require a wrapper name or a wrapper id. For example,
 
 `POST /xapi/projects/{project}/wrapper/{wrapperId}/launch`
 
-has two variables, indicated by the placeholders in braces, that would need to be supplied by us, project and wrapperId. 
+has two variables, indicated by the placeholders in braces, that would need to be supplied by us, project and wrapperId.
 
 Another small complexity is that, at least in the current version of XNAT, 1.7.4.1, you'll notice that some of the routes have the note "Does not work properly in Swagger UI."  All the routes that *do* work through the Swagger UI require a project. We'll work around this by supplying a project, even if it shouldn't be strickly necessary.  It's also possible that if you are using 1.7.4.1, you'll find that a different set of routes work then the ones assumed to work in this tutorial (see [here](https://groups.google.com/forum/#!topic/xnat_discussion/ePwqyr3OmLs) for a discussion of why.)
 
@@ -192,7 +192,7 @@ This JSON object tells us that our API request was successful and that we launch
 
 ### Investigating the Command History
 
-Navigate to Administer -> Plugin Settings -> Command History
+Navigate to **Administer -> Plugin Settings -> Command History**
 
 You should see your newly executed command.  Click on the command description to get more information about what happened at execution time.  
 
@@ -201,8 +201,8 @@ You should see your newly executed command.  Click on the command description to
 
 You should see a table that looks something like this:
 
- Key	| Value 
- --- | ----- 
+ Key	| Value
+ --- | -----
  id	| 83 |
 command-id | 26
 status	| Complete
@@ -223,9 +223,9 @@ subtype	| docker
 parent-source-object-name	| null
 env	| {"XNAT_USER":"51d0ddc5-e027-4177-bed9-74577507d9db","XNAT_HOST":"http://10.1.1.17","XNAT_PASS":"******"}
 ports	| {}
-mounts	
+mounts
 inputs	| {"id":440,"type":"command","name":"my_cool_input","value":"Hello world"}
-outputs	
+outputs
 history	| {"id":396,"status":"Created","entity-type":"user","entity-id":"admin","time-recorded":1526395800062}  {"id":397,"status":"create","entity-type":"event","time-recorded":1526395805207,"external-timestamp":"1526395800057904581"} {"id":398,"status":"start","entity-type":"event","time-recorded":1526395805229,"external-timestamp":"1526395800335165881"} {"id":399,"status":"die","entity-type":"event","time-recorded":1526395805251,"external-timestamp":"1526395800418540450","exitCode":"0"}
 log-paths	| /data/xnat/archive/CONTAINER_EXEC/20180515_145005/LOGS/stdout.log
 reserve-memory	| null
@@ -240,7 +240,7 @@ It should say "Hello world".
 
 ### Changing the Input
 
-What if we wanted to print something else to standard out.  We don't have to change our command.  Instead, because our command knows that it takes an input, we can send that input with our POST request as a value in the request body.  Try typing making your request again, but this time entering `{"my_cool_input":"Hello Pluto"}` in the allRequestParams box in the Swagger UI.  Now when you go to Command History -> description for your most execution -> View StdOut.log, you'll see "Hello Pluto".
+What if we wanted to print something else to standard out?  We don't have to change our command.  Instead, because our command knows that it takes an input, we can send that input with our POST request as a value in the request body.  Try typing making your request again, but this time entering `{"my_cool_input":"Hello Pluto"}` in the allRequestParams box in the Swagger UI.  Now when you go to Command History -> description for your most execution -> View StdOut.log, you'll see "Hello Pluto".
 
 (XNAT troubleshooting: occasionally Command History decides not to display.  I find that creating and deleting a command from the Images and Commands display can make it show up again.)
 
@@ -258,6 +258,6 @@ ahd change it to
 
 Now you should see the StdErr.log reads `ls: cannot access foo: No such file or directory`.
 
-(XNAT troubleshooting: sometimes XNAT gets itself into a state where it can't save edits to a command.  Sometimes it appears to spontaneously reorder elements of a command you've written, which in some cases can damage functionality.  When that happens you can copy your command, delete the existing command, and add a new command with your edits.) 
+(XNAT troubleshooting: sometimes XNAT gets itself into a state where it can't save edits to a command.  Sometimes it appears to spontaneously reorder elements of a command you've written, which in some cases can damage functionality.  When that happens you can copy your command, delete the existing command, and add a new command with your edits.)
 
-<a name="asterisk">*</a> The example given in the documentation does not include an XNAT wrapper, but in practice I don't know how that example can be launched. All current routes in the REST API require a wrapper name or wrapper id. 
+<a name="asterisk">*</a> The example given in the documentation does not include an XNAT wrapper, but in practice I don't know how that example can be launched. All current routes in the REST API require a wrapper name or wrapper id.
