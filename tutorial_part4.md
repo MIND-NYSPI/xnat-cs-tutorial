@@ -2,7 +2,7 @@
 
 ## Part 4. Accepting Arbitrary Inputs and Outputs: FSL's FLIRT
 
-### Table of Contents 
+### Table of Contents
 
 [Multiple Inputs and Outputs](#multiple-inputs-and-outputs)  
 [Getting Our Sample Data Into XNAT](#getting-our-sample-data-into-xnat)  
@@ -21,9 +21,9 @@ The next step in generalizing our approach is to write commands that can take mu
 To run FLIRT, we need two NIFTI files.  We can use the sample data available [here](http://www.fmrib.ox.ac.uk/primers/intro_primer/ExBox11/IntroBox11.html).  Click Data Download.  You will need to uncompress your data files.  There are multiple means of doing this; on a Mac double click should just work. First uncompress the main ExBox11 directory, and then the structural.nii.gz file and the fmri.nii.gz file.  
 
 We need to get this data into XNAT.  Navigate to the CS_Tutorial project page and click **Add->Subject**.
-I named my new subject '001', since I'm not very concerned with naming consistency with dcmtest1. 
+I named my new subject '001', since I'm not very concerned with naming consistency with dcmtest1.
 
-![Add a subject](AddSubject.png) 
+![Add a subject](AddSubject.png)
 
 ![Subject information](SubjectDetails.png)
 
@@ -48,10 +48,10 @@ Before we upload our files we need to make the resource folder for them. Click *
 ![Add folder](AddFolder.png)
 
  Select Scans for Level, select 1 for Item, and name the folder NIFTI.  Click **Create**.
- 
+
  ![Create folder](CreateFolder.png)
- 
- Then create the same folder, also named 'NIFTI', for Scan 2. 
+
+ Then create the same folder, also named 'NIFTI', for Scan 2.
 
  Now click **Upload Files**.  
 
@@ -77,7 +77,7 @@ In our command, we will emulate that structure in the `command-line` entry:
 
  `"command-line": "flirt -in /in/[INVOL] -ref /ref/[REFVOL] -out /out/[OUTVOL] -omat /outmat/[OUTMAT] [DOF]"`
 
-We have two inputs and two outputs.  We need a mount path for each of these outputs.  The four mounts, as you can see, are at paths `/in`, `/ref`, `/out`,  and `/outmat`, to mount the input volume, the reference volume (which is also an input, just not not in the FLIRT terminology), and our two outputs: the registered volume and the transformation matrix. 
+We have two inputs and two outputs.  We need a mount path for each of these outputs.  The four mounts, as you can see, are at paths `/in`, `/ref`, `/out`,  and `/outmat`, to mount the input volume, the reference volume (which is also an input, just not not in the FLIRT terminology), and our two outputs: the registered volume and the transformation matrix.
 
 ### Command Line Inputs and Outputs
 
@@ -150,7 +150,7 @@ We next need to specify our command line inputs:
       "true-value": null,
       "false-value": null
     }
-  ``` 
+  ```
 
 We've made a couple of different choices here than in the bet command.  Before, we allowed the command line input that provided the name of our output to be null, i.e., we set "required" to "false", and we provided a default value so that the program in the application-program interface (us, at the Swagger UI) didn't have to provide it.  Either choice is valid; it's up to the person writing the command to decide.
 
@@ -179,7 +179,7 @@ Next we specify the outputs.
   ],
 ```
 
-There's something made explicit here that we left implicit when specifying outputs for bet. 
+There's something made explicit here that we left implicit when specifying outputs for bet.
 "Path" refers to the relative path from the mount directory where we want to store our files.  In this case, we want to store our files in the top level directory of the mount point. `.` refers the current working directory, the mount point.  This might become relevant if you had a process that created multiple subdirectories, and had to place your output files in one of them.
 
 ### Checks for Understanding: Mounts, Wrapper Inputs and Output Handlers for FLIRT ###
@@ -200,13 +200,13 @@ Ok, are you done checking for understanding?  Then go on to the next section.
 
 ### Executing the Command
 
-If we use this path `POST /xapi/commands/{commandId}/wrappers/{wrapperName}/launch`, we can take note of the command ID by opening it back up again ([as we did](./tutorial_part1.md/#running-our-hello-world-command) in Part 1), supply the wrapper name, `flirt-wrapper`, and the request parameters, 
+If we use this path `POST /xapi/commands/{commandId}/wrappers/{wrapperName}/launch`, we can take note of the command ID by opening it back up again ([as we did](./tutorial_part1.md/#running-our-hello-world-command) in Part 1), supply the wrapper name, `flirt-wrapper`, and the request parameters,
 
 ```
 {
 "invol_scan":"/experiments/XNAT_E00006/scans/2",
 "refvol_scan":"/experiments/XNAT_E00006/scans/1",
-"out_fname":"transformed.nii", 
+"out_fname":"transformed.nii",
 "mat_fname":"transform.txt",
 "dof": "12"
 }    
@@ -218,24 +218,8 @@ Click **Try It Out!**. Did you get a success response? If so, [investigate the c
 
 If all went well, you should be able to see your new files in the File Manager.
 
-![FLIRT files](FLIRTfiles.png)  
+![FLIRT files](FLIRTFiles.png)  
 
 ### Goodbye For Now
 
 That's it for this tutorial.  Later iterations may contain discussions of how to make your XNAT server communicate with remote container servers, so you can do your computing on any machine.
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
